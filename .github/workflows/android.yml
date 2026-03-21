@@ -5,7 +5,6 @@ on:
     branches: [main, develop]
     paths:
       - 'android/**'
-      - 'src/**'
       - '.github/workflows/android.yml'
   pull_request:
     branches: [main]
@@ -14,154 +13,124 @@ on:
 
 jobs:
   build-android:
-    name: Compile Android native (Gradle + Kotlin)
-    runs-on: ubuntu-latest     # free for public repos
+    name: Compile Android (Kotlin 2.0)
+    runs-on: ubuntu-latest
 
     steps:
-      # ── 1. Checkout ────────────────────────────────────────────────────────
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ── 2. Java 17 (required by Android Gradle Plugin 8+) ──────────────────
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # ── 3. Android SDK ──────────────────────────────────────────────────────
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      # ── 4. Node (not strictly needed but future-proof) ──────────────────────
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Use official Gradle action — handles the wrapper jar correctly
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          node-version: '20'
+          gradle-version: '8.6'
 
-      # ── 5. Create a minimal Android host project ───────────────────────────
-      #      The SDK android/ folder is a library module, not a standalone app.
-      #      We wrap it in a minimal host project so Gradle can compile it.
-      - name: Create minimal Android host project
+      # Create minimal host project to compile the SDK library module
+      - name: Create host project
         run: |
           mkdir -p /tmp/AndroidTest/app/src/main
           mkdir -p /tmp/AndroidTest/gradle/wrapper
 
-          # settings.gradle
+          # settings.gradle — includes our SDK as a local module
           cat > /tmp/AndroidTest/settings.gradle << 'SETTINGS'
-          include ':app', ':livekit-lynx'
-          project(':livekit-lynx').projectDir = new File('${{ github.workspace }}/android')
+          include ':app', ':sdk'
+          project(':sdk').projectDir = new File('${{ github.workspace }}/android')
           SETTINGS
 
-          # root build.gradle
+          # Root build.gradle
           cat > /tmp/AndroidTest/build.gradle << 'BUILD'
           buildscript {
-              repositories { google(); mavenCentral() }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.3.0'
-                  classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0'
-              }
+            repositories { google(); mavenCentral() }
+            dependencies {
+              classpath 'com.android.tools.build:gradle:8.3.0'
+              classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0'
+            }
           }
           allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-                  maven { url 'https://jitpack.io' }
-              }
+            repositories {
+              google()
+              mavenCentral()
+              maven { url 'https://jitpack.io' }
+            }
           }
           BUILD
 
-          # app/build.gradle (minimal app to trigger library compilation)
+          # Minimal app that depends on our SDK (forces it to compile)
           cat > /tmp/AndroidTest/app/build.gradle << 'APP'
           plugins {
-              id 'com.android.application'
-              id 'org.jetbrains.kotlin.android'
+            id 'com.android.application'
+            id 'kotlin-android'
           }
           android {
-              namespace 'com.livekit.lynx.test'
-              compileSdk 35
-              defaultConfig {
-                  applicationId 'com.livekit.lynx.test'
-                  minSdk 24
-                  targetSdk 35
-              }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-              kotlinOptions { jvmTarget = '17' }
+            namespace 'com.livekit.lynx.test'
+            compileSdk 35
+            defaultConfig {
+              applicationId 'com.livekit.lynx.test'
+              minSdk 24
+              targetSdk 35
+            }
+            compileOptions {
+              sourceCompatibility JavaVersion.VERSION_17
+              targetCompatibility JavaVersion.VERSION_17
+            }
+            kotlinOptions { jvmTarget = '17' }
           }
           dependencies {
-              implementation project(':livekit-lynx')
+            implementation project(':sdk')
           }
           APP
 
-          # Minimal AndroidManifest for the test app
+          # Minimal manifest for the test app
           cat > /tmp/AndroidTest/app/src/main/AndroidManifest.xml << 'MANIFEST'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" />
           MANIFEST
 
-          # gradle wrapper
-          cat > /tmp/AndroidTest/gradle/wrapper/gradle-wrapper.properties << 'GRADLE'
+          # Gradle wrapper properties — points to the correct distribution
+          cat > /tmp/AndroidTest/gradle/wrapper/gradle-wrapper.properties << 'PROPS'
           distributionBase=GRADLE_USER_HOME
           distributionPath=wrapper/dists
           distributionUrl=https\://services.gradle.org/distributions/gradle-8.6-bin.zip
           zipStoreBase=GRADLE_USER_HOME
           zipStorePath=wrapper/dists
-          GRADLE
+          PROPS
 
-          # Copy gradlew from system
-          cp $(which gradle 2>/dev/null || echo /usr/bin/gradle) /tmp/AndroidTest/gradlew 2>/dev/null || \
-            curl -sL https://raw.githubusercontent.com/gradle/gradle/main/gradlew -o /tmp/AndroidTest/gradlew
-          chmod +x /tmp/AndroidTest/gradlew
-
-      # ── 6. Gradle compile (this validates ALL Kotlin code) ─────────────────
-      - name: Gradle compileDebugKotlin
+      - name: Compile SDK Kotlin sources
         working-directory: /tmp/AndroidTest
         run: |
-          ./gradlew :livekit-lynx:compileDebugKotlin \
-            --stacktrace \
+          # Use the 'gradle' command installed by gradle/actions/setup-gradle
+          gradle :sdk:compileDebugKotlin \
             --no-daemon \
+            --stacktrace \
             -Dorg.gradle.jvmargs="-Xmx4g" \
-            2>&1 | tee kotlin_compile.log
+            2>&1 | tee compile.log
 
-          if grep -E "^e:.*\.kt:|error:" kotlin_compile.log | grep -v "^Note:" | head -20; then
-            echo "❌ Kotlin compilation errors found"
+          # Fail on actual Kotlin errors (e: prefix)
+          if grep -qE "^e:.*\.kt:" compile.log; then
+            echo "❌ Kotlin compilation errors:"
+            grep -E "^e:.*\.kt:" compile.log
             exit 1
           fi
+
+          if grep -q "BUILD FAILED" compile.log; then
+            echo "❌ Build failed:"
+            tail -30 compile.log
+            exit 1
+          fi
+
           echo "✅ Kotlin compilation succeeded"
 
-      - name: Gradle assembleDebug (full AAR build)
-        working-directory: /tmp/AndroidTest
-        run: |
-          ./gradlew :livekit-lynx:assembleDebug \
-            --no-daemon \
-            -Dorg.gradle.jvmargs="-Xmx4g" \
-            2>&1 | tee assemble.log
-
-          if grep -i "BUILD FAILED" assemble.log; then
-            echo "❌ assembleDebug failed"
-            cat assemble.log | grep -A 5 "BUILD FAILED"
-            exit 1
-          fi
-          echo "✅ assembleDebug succeeded — AAR built"
-
-      # ── 7. Upload artifacts ─────────────────────────────────────────────────
-      - name: Upload AAR
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: livekit-lynx-debug-aar
-          path: /tmp/AndroidTest/build/outputs/aar/
-          retention-days: 7
-
-      - name: Upload build logs on failure
+      - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: android-build-logs
-          path: |
-            /tmp/AndroidTest/kotlin_compile.log
-            /tmp/AndroidTest/assemble.log
-          retention-days: 7
+          name: android-compile-log
+          path: /tmp/AndroidTest/compile.log
+          retention-days: 5

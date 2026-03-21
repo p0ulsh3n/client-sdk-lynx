@@ -6,9 +6,9 @@ Pod::Spec.new do |s|
   s.name          = 'livekit-lynx'
   s.version       = package['version']
   s.summary       = package['description']
-  s.homepage      = package['homepage']
-  s.license       = package['license']
-  s.authors       = package['author']
+  s.homepage      = 'https://github.com/livekit/client-sdk-lynx'
+  s.license       = { :type => 'Apache-2.0', :file => 'LICENSE' }
+  s.authors       = 'LiveKit contributors'
 
   s.platforms     = { ios: '14.0' }
   s.source        = {
@@ -16,27 +16,24 @@ Pod::Spec.new do |s|
     tag: "v#{s.version}"
   }
 
-  # All native source files live in ios/
-  s.source_files  = 'ios/**/*.{h,m,mm,swift}'
+  # All native source in ios/
+  s.source_files        = 'ios/**/*.{h,m,mm,swift}'
   s.public_header_files = 'ios/**/*.h'
 
-  # Swift 6 strict concurrency
+  # Swift 6
   s.swift_version = '6.0'
 
-  # Required system frameworks
-  s.frameworks = 'AVFoundation', 'Accelerate', 'CoreMotion',
-                 'CoreImage', 'CoreVideo', 'CoreMedia',
-                 'VideoToolbox', 'AudioToolbox', 'AVFAudio'
+  # AVFAudio required (same as livekit-react-native.podspec)
+  s.framework = 'AVFAudio'
 
-  # Required for Swift/ObjC interop
+  # Swift/ObjC interop
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 
-  # Lynx framework
+  # Lynx SDK
   s.dependency 'Lynx'
 
-  # Google WebRTC (same version as livekit-client-sdk-swift)
+  # Google WebRTC (same pinning as livekit-react-native-webrtc)
   s.dependency 'WebRTC-SDK', '~> 125.0'
 
-  # Twilio AudioSwitch for audio routing
-  s.dependency 'AudioSwitch', '~> 1.0'
+  # NOTE: AudioSwitch is Android-only. iOS uses AVFoundation/AVAudioSession directly.
 end
