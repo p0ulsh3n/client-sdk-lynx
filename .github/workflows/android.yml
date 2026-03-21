@@ -10,7 +10,9 @@ on:
     branches: [main]
     paths:
       - 'android/**'
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
   build-android:
     name: Compile Android (Kotlin 2.0)

@@ -13,6 +13,9 @@ on:
       - 'ios/**'
       - 'livekit-lynx.podspec'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
   build-ios:
     name: Compile iOS (Swift 6 + ObjC)
