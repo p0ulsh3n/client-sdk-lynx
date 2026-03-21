@@ -36,7 +36,16 @@
     "pods": "cd example && pod install --project-directory=ios",
     "bootstrap": "yarn example && yarn && yarn pods"
   },
-  "keywords": ["livekit", "lynx", "reactlynx", "webrtc", "video", "audio", "realtime", "tiktok"],
+  "keywords": [
+    "livekit",
+    "lynx",
+    "reactlynx",
+    "webrtc",
+    "video",
+    "audio",
+    "realtime",
+    "tiktok"
+  ],
   "author": "LiveKit contributors",
   "license": "Apache-2.0",
   "repository": {
@@ -60,12 +69,9 @@
     "base64-js": "^1.5.1"
   },
   "peerDependencies": {
-    "@lynx-js/react": ">=0.1.0",
     "livekit-client": "^2.15.0"
   },
   "devDependencies": {
-    "@lynx-js/react": "^0.1.0",
-    "@lynx-js/types": "^0.1.0",
     "livekit-client": "^2.15.0",
     "typescript": "^5.5.0",
     "eslint": "^9.0.0",
@@ -76,7 +82,14 @@
   ],
   "jest": {
     "preset": "react-native",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   },
   "react-native-builder-bob": {
     "source": "src",
@@ -84,7 +97,12 @@
     "targets": [
       "commonjs",
       "module",
-      ["typescript", { "project": "tsconfig.build.json" }]
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
     ]
   }
 }

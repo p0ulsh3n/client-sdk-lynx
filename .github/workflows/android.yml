@@ -104,6 +104,12 @@ jobs:
           zipStorePath=wrapper/dists
           PROPS
 
+          # Fix AndroidX + Jetifier (obligatoire à cause des dépendances androidx.core/core-ktx)
+          cat > /tmp/AndroidTest/gradle.properties << 'GP'
+          android.useAndroidX=true
+          android.enableJetifier=true
+          GP
+
       - name: Compile SDK Kotlin sources
         working-directory: /tmp/AndroidTest
         run: |
