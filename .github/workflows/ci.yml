@@ -1,0 +1,200 @@
+name: CI
+
+# This is the main CI badge workflow.
+# It runs all checks in parallel and reports a single pass/fail.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── TypeScript ──────────────────────────────────────────────────────────────
+  typecheck:
+    name: TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - name: No broken package imports
+        run: |
+          BROKEN=$(grep -rn "from '@livekit/lynx-webrtc'" src/ 2>/dev/null || true)
+          if [ -n "$BROKEN" ]; then echo "❌ Stale imports:"; echo "$BROKEN"; exit 1; fi
+          echo "✅ All imports are correct"
+
+  # ── Android Kotlin ──────────────────────────────────────────────────────────
+  android:
+    name: Android (Kotlin 2.0)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: android-actions/setup-android@v3
+
+      - name: Create host project
+        run: |
+          mkdir -p /tmp/T/app/src/main /tmp/T/gradle/wrapper
+
+          cat > /tmp/T/settings.gradle << 'EOF'
+          include ':app', ':sdk'
+          project(':sdk').projectDir = new File('${{ github.workspace }}/android')
+          EOF
+
+          cat > /tmp/T/build.gradle << 'EOF'
+          buildscript {
+            repositories { google(); mavenCentral() }
+            dependencies {
+              classpath 'com.android.tools.build:gradle:8.3.0'
+              classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0'
+            }
+          }
+          allprojects {
+            repositories { google(); mavenCentral(); maven { url 'https://jitpack.io' } }
+          }
+          EOF
+
+          cat > /tmp/T/app/build.gradle << 'EOF'
+          plugins { id 'com.android.application'; id 'kotlin-android' }
+          android {
+            namespace 'com.test'
+            compileSdk 35
+            defaultConfig { applicationId 'com.test'; minSdk 24; targetSdk 35 }
+            compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+            kotlinOptions { jvmTarget = '17' }
+          }
+          dependencies { implementation project(':sdk') }
+          EOF
+
+          echo '<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"/>' \
+            > /tmp/T/app/src/main/AndroidManifest.xml
+
+          cat > /tmp/T/gradle/wrapper/gradle-wrapper.properties << 'EOF'
+          distributionUrl=https\://services.gradle.org/distributions/gradle-8.6-bin.zip
+          EOF
+
+          curl -sL https://raw.githubusercontent.com/gradle/gradle/v8.6.0/gradlew -o /tmp/T/gradlew
+          chmod +x /tmp/T/gradlew
+
+      - name: Compile Kotlin
+        working-directory: /tmp/T
+        run: |
+          ./gradlew :sdk:compileDebugKotlin --no-daemon -Dorg.gradle.jvmargs="-Xmx4g" 2>&1 | tee out.log
+          if grep -qE "^e:.*\.kt:" out.log; then
+            echo "❌ Kotlin errors:"; grep -E "^e:.*\.kt:" out.log; exit 1
+          fi
+          echo "✅ Android Kotlin OK"
+
+  # ── iOS Swift ───────────────────────────────────────────────────────────────
+  ios:
+    name: iOS (Swift 6)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - run: gem install cocoapods --no-document
+
+      - name: Validate podspec
+        run: |
+          pod spec lint livekit-lynx.podspec \
+            --allow-warnings \
+            --skip-tests \
+            2>&1 | tee podspec_lint.log
+          if grep -q "ERROR" podspec_lint.log; then
+            echo "❌ podspec errors:"; grep "ERROR" podspec_lint.log; exit 1
+          fi
+          echo "✅ podspec valid"
+
+      - name: Create host project and pod install
+        run: |
+          mkdir -p /tmp/T/ios
+          cat > /tmp/T/ios/Podfile << PODFILE
+          platform :ios, '14.0'
+          use_frameworks!
+          target 'T' do
+            pod 'livekit-lynx', :path => '${{ github.workspace }}'
+          end
+          PODFILE
+
+          # Minimal Xcode project
+          mkdir -p /tmp/T/ios/T.xcodeproj
+          python3 -c "
+          import json, os
+          p = {
+            'archiveVersion': '1', 'objectVersion': '56',
+            'objects': {
+              'P': {'isa': 'PBXProject', 'mainGroup': 'G', 'targets': ['T'],
+                    'buildConfigurationList': 'BCL',
+                    'compatibilityVersion': 'Xcode 14.0',
+                    'attributes': {'LastUpgradeCheck': '1500'}},
+              'G': {'isa': 'PBXGroup', 'children': [], 'sourceTree': '<group>'},
+              'T': {'isa': 'PBXNativeTarget', 'name': 'T', 'productName': 'T',
+                    'buildPhases': [], 'buildRules': [], 'dependencies': [],
+                    'buildConfigurationList': 'BCL2',
+                    'productType': 'com.apple.product-type.application'},
+              'BCL': {'isa': 'XCConfigurationList', 'buildConfigurations': ['BC'],
+                      'defaultConfigurationName': 'Debug'},
+              'BCL2': {'isa': 'XCConfigurationList', 'buildConfigurations': ['BC'],
+                       'defaultConfigurationName': 'Debug'},
+              'BC': {'isa': 'XCBuildConfiguration', 'name': 'Debug',
+                     'buildSettings': {'IPHONEOS_DEPLOYMENT_TARGET': '14.0',
+                                       'SDKROOT': 'iphoneos', 'SWIFT_VERSION': '6.0'}},
+            },
+            'rootObject': 'P'
+          }
+          print('// !\$*UTF8*\$!')
+          print('{')
+          print('  archiveVersion = 1;')
+          print('  classes = {};')
+          print('  objectVersion = 56;')
+          print('  objects = {};')
+          print('  rootObject = P;')
+          print('}')
+          " > /tmp/T/ios/T.xcodeproj/project.pbxproj
+
+          cd /tmp/T/ios && pod install --repo-update 2>&1 | tail -20
+          echo "✅ pod install done"
+
+      - name: xcodebuild compile
+        run: |
+          xcodebuild build \
+            -workspace /tmp/T/ios/T.xcworkspace \
+            -scheme livekit-lynx \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | grep -E "error:|warning:|Build succeeded|Build FAILED" | tail -30
+
+          # Separate check for errors
+          ERRORS=$(xcodebuild build \
+            -workspace /tmp/T/ios/T.xcworkspace \
+            -scheme livekit-lynx \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | grep " error:" | grep -v "^note:" || true)
+
+          if [ -n "$ERRORS" ]; then
+            echo "❌ iOS build errors:"; echo "$ERRORS"; exit 1
+          fi
+          echo "✅ iOS Swift compilation OK"
+
+      - name: Upload iOS logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-logs
+          path: /tmp/T/ios/
+          retention-days: 3

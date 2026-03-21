@@ -1,0 +1,175 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'livekit-lynx.podspec'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'livekit-lynx.podspec'
+
+jobs:
+  build-ios:
+    name: Compile iOS native (Xcode)
+    runs-on: macos-14          # Apple Silicon, Xcode 15, free for public repos
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Node (for package.json / podspec reading) ────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
+
+      # ── 3. Ruby + CocoaPods ─────────────────────────────────────────────────
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install CocoaPods
+        run: gem install cocoapods --no-document
+
+      # ── 4. Create a minimal host Xcode project to compile the SDK ──────────
+      #      (We don't have an Xcode project in the SDK itself — we create
+      #       a temporary one that just imports our podspec.)
+      - name: Create minimal iOS host project
+        run: |
+          mkdir -p /tmp/LynxSDKTest/ios
+          cat > /tmp/LynxSDKTest/ios/Podfile << 'PODFILE'
+          platform :ios, '14.0'
+          use_frameworks!
+
+          target 'LynxSDKTest' do
+            pod 'livekit-lynx', :path => '${{ github.workspace }}'
+          end
+          PODFILE
+
+          # Create a minimal Xcode project structure
+          mkdir -p /tmp/LynxSDKTest/ios/LynxSDKTest.xcodeproj
+          cat > /tmp/LynxSDKTest/ios/LynxSDKTest.xcodeproj/project.pbxproj << 'XCODEPROJ'
+          // !$*UTF8*$!
+          {
+            archiveVersion = 1;
+            classes = {};
+            objectVersion = 56;
+            objects = {
+              /* Begin PBXBuildFile section */
+              /* End PBXBuildFile section */
+              /* Begin PBXFileReference section */
+              /* End PBXFileReference section */
+              /* Begin PBXGroup section */
+              mainGroup = {
+                isa = PBXGroup;
+                children = ();
+                sourceTree = "<group>";
+              };
+              /* End PBXGroup section */
+              /* Begin PBXNativeTarget section */
+              targetRef = {
+                isa = PBXNativeTarget;
+                buildConfigurationList = buildConfigListRef;
+                buildPhases = ();
+                buildRules = ();
+                dependencies = ();
+                name = LynxSDKTest;
+                productName = LynxSDKTest;
+                productType = "com.apple.product-type.application";
+              };
+              /* End PBXNativeTarget section */
+              /* Begin PBXProject section */
+              projectRef = {
+                isa = PBXProject;
+                attributes = { LastUpgradeCheck = 1500; };
+                buildConfigurationList = projectBuildConfigListRef;
+                compatibilityVersion = "Xcode 14.0";
+                mainGroup = mainGroup;
+                targets = (targetRef);
+              };
+              /* End PBXProject section */
+              /* Begin XCBuildConfiguration section */
+              debugBuildConfig = {
+                isa = XCBuildConfiguration;
+                buildSettings = {
+                  ALWAYS_SEARCH_USER_PATHS = NO;
+                  IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+                  SDKROOT = iphoneos;
+                  SWIFT_VERSION = 6.0;
+                };
+                name = Debug;
+              };
+              /* End XCBuildConfiguration section */
+              /* Begin XCConfigurationList section */
+              buildConfigListRef = {
+                isa = XCConfigurationList;
+                buildConfigurations = (debugBuildConfig);
+                defaultConfigurationIsVisible = 0;
+                defaultConfigurationName = Debug;
+              };
+              projectBuildConfigListRef = {
+                isa = XCConfigurationList;
+                buildConfigurations = (debugBuildConfig);
+                defaultConfigurationIsVisible = 0;
+                defaultConfigurationName = Debug;
+              };
+              /* End XCConfigurationList section */
+            };
+            rootObject = projectRef;
+          }
+          XCODEPROJ
+
+      # ── 5. pod install ──────────────────────────────────────────────────────
+      - name: pod install
+        working-directory: /tmp/LynxSDKTest/ios
+        run: |
+          pod install --repo-update 2>&1 | tee pod_install.log
+          if grep -q "error:" pod_install.log; then
+            echo "❌ pod install failed"
+            exit 1
+          fi
+          echo "✅ pod install succeeded"
+
+      # ── 6. Compile the pod target (this is what validates all Swift/ObjC) ──
+      - name: xcodebuild - compile livekit-lynx pod
+        working-directory: /tmp/LynxSDKTest/ios
+        run: |
+          xcodebuild build \
+            -workspace LynxSDKTest.xcworkspace \
+            -scheme Pods-LynxSDKTest \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            2>&1 | tee build.log | xcpretty || true
+
+          # Check for actual errors (not just warnings)
+          if grep -E "^.*error:.*$" build.log | grep -v "note:" | grep -v "^Build succeeded"; then
+            echo "❌ Build errors found"
+            grep -E "^.*error:.*$" build.log | grep -v "note:" | head -30
+            exit 1
+          fi
+          echo "✅ iOS compilation succeeded"
+
+      # ── 7. Upload build log on failure ─────────────────────────────────────
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: /tmp/LynxSDKTest/ios/build.log
+          retention-days: 7

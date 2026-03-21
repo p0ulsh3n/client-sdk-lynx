@@ -1,0 +1,11 @@
+# client-sdk-lynx — consumer-rules.pro
+-keep class org.webrtc.** { *; }
+-keepclassmembers class org.webrtc.** { *; }
+-dontwarn org.webrtc.**
+-keep class com.paramsen.noise.** { *; }
+-dontwarn com.paramsen.noise.**
+-keep class com.twilio.audioswitch.** { *; }
+-dontwarn com.twilio.audioswitch.**
+-keep class com.livekit.lynx.** { *; }
+-keepclassmembers class com.livekit.lynx.** { *; }
+-keepclassmembers class * { @com.lynx.jsbridge.LynxMethod *; }

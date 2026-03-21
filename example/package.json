@@ -1,0 +1,20 @@
+{
+  "name": "livekit-lynx-example",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TikTok-style LIVE room example using @livekit/lynx",
+  "scripts": {
+    "start": "lynx-cli start",
+    "android": "lynx-cli run android",
+    "ios": "lynx-cli run ios",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@livekit/lynx": "*",
+    "livekit-client": "^2.15.0"
+  },
+  "devDependencies": {
+    "@lynx-js/react": "^0.1.0",
+    "typescript": "^5.5.0"
+  }
+}

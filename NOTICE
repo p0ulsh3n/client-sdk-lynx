@@ -1,0 +1,7 @@
+LiveKit Client SDK for Lynx
+Copyright 2024 LiveKit contributors
+
+Portions adapted from:
+- client-sdk-react-native (Apache 2.0) — Copyright 2022 LiveKit, Inc.
+- client-sdk-flutter (Apache 2.0) — Copyright 2022 LiveKit, Inc.
+- ExoVisualizer (MIT) — Copyright 2019 Dániel Zolnai

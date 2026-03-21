@@ -1,0 +1,29 @@
+node_modules/
+lib/
+.yarn/cache
+.yarn/install-state.gz
+*.log
+
+# iOS
+*.xcworkspace
+Pods/
+*.ipa
+DerivedData/
+*.xccheckout
+
+# Android
+.gradle/
+local.properties
+*.apk
+*.aab
+build/
+.cxx/
+
+# macOS
+.DS_Store
+*.swp
+.idea/
+.vscode/settings.json
+
+# TypeScript build output
+*.tsbuildinfo
