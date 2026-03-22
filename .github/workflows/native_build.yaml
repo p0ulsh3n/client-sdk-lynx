@@ -13,6 +13,7 @@ on:
 jobs:
   android-compile:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,11 +21,11 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22          # Node 20 deprecated June 2026 — use 22
           cache: 'yarn'
           cache-dependency-path: '**/yarn.lock'
 
@@ -32,8 +33,6 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/node_modules
-            ~/ci/node_modules
             ~/.config/yarn/global
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
@@ -54,6 +53,7 @@ jobs:
 
   ios-compile:
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -67,8 +67,6 @@ jobs:
         with:
           path: |
             ~/.npm
-            ~/node_modules
-            ~/ci/node_modules
             ~/.config/yarn/global
           key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
@@ -115,7 +113,6 @@ jobs:
             -scheme ci \
             -destination generic/platform=iOS \
             -configuration Debug \
-            -verbose \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_ENTITLEMENTS="" \

@@ -26,16 +26,12 @@
     "!**/__mocks__"
   ],
   "scripts": {
-    "build": "bob build",
-    "typecheck": "tsc --noEmit",
+    "typescript": "tsc --noemit -p tsconfig.build.json",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepare": "bob build",
     "release": "release-it",
-    "example": "yarn --cwd example",
     "pods": "cd example && pod install --project-directory=ios",
-    "bootstrap": "yarn example && yarn && yarn pods",
-    "typescript": "tsc --noemit -p tsconfig.build.json",
-    "ci": "cd ci && yarn"
+    "bootstrap": "yarn && yarn pods"
   },
   "keywords": [
     "livekit",
@@ -81,9 +77,6 @@
     "eslint": "^9.0.0",
     "react-native-builder-bob": "^0.32.0"
   },
-  "workspaces": [
-    "example"
-  ],
   "jest": {
     "preset": "react-native",
     "moduleFileExtensions": [
