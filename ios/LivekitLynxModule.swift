@@ -8,6 +8,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import AVFoundation
+import AVKit
 import Foundation
 import WebRTC
 
