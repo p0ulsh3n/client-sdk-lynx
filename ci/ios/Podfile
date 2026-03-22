@@ -8,8 +8,8 @@ end
 # ── Fix C++ build + Xcode 16 compat for Lynx / PrimJS pods ─────────────────
 # Problem:
 #   - Lynx .cc files (worklet_utils.cc etc.) need C++17 features
-#   - Lynx .m files (LynxTextLayoutManager.m) include C++ headers
-#   - std::result_of_t is deprecated in C++17 — warnings must not be errors
+#   - Lynx .m files may use deprecated APIs → suppress warnings
+#   - std::result_of_t is deprecated in C++17 → must not be treated as error
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
@@ -19,17 +19,9 @@ post_install do |installer|
       # Never treat warnings as errors in third-party pods
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
-      # Suppress deprecation + other warnings, increase error limit
-      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-error -Wno-deprecated-declarations -Wno-deprecated -Wno-shorten-64-to-32 -Wno-comma -Wno-unreachable-code -ferror-limit=0'
-      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-error -Wno-deprecated-declarations -Wno-deprecated -Wno-shorten-64-to-32 -ferror-limit=0'
-    end
-
-    # Force Lynx pod .m files to compile as Objective-C++ so C++ headers work
-    if target.name == 'Lynx'
-      target.source_build_phase.files.each do |file|
-        next unless file.file_ref&.path&.end_with?('.m')
-        file.settings = { 'COMPILER_FLAGS' => '-x objective-c++ -Wno-error -Wno-deprecated-declarations -Wno-deprecated' }
-      end
+      # Suppress deprecation + other warnings, remove error limit
+      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
+      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
     end
   end
 end
