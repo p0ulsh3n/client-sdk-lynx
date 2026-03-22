@@ -36,7 +36,7 @@ import WebRTC
         let options = LynxWebRTCModuleOptions.sharedInstance()
         options.videoEncoderFactory = simulcastFactory
         options.audioProcessingModule =
-            LynxAudioProcessingManager.shared.audioProcessingModule
+            LKLynxAudioProcessingManager.sharedInstance().audioProcessingModule
     }
 }
 

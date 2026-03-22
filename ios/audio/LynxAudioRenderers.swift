@@ -208,48 +208,8 @@ public final class LynxAudioSinkRenderer: BaseAudioSinkRenderer {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MARK: - LynxAudioProcessingManager
+// MARK: - Audio Processing Manager
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Singleton managing the WebRTC audio processing pipeline for local mic tracks.
-/// Replaces `LKAudioProcessingManager` from the RN SDK.
-public final class LynxAudioProcessingManager: @unchecked Sendable {
-
-    public static let shared = LynxAudioProcessingManager()
-
-    // Audio processing module injected into RTCPeerConnectionFactory
-    public let audioProcessingModule: RTCAudioProcessingModule
-
-    private let lock = NSLock()
-    private var localRenderers: [ObjectIdentifier: RTCAudioRenderer] = [:]
-
-    private init() {
-        audioProcessingModule = RTCAudioProcessingModule()
-    }
-
-    public func addLocalAudioRenderer(_ renderer: RTCAudioRenderer) {
-        let id = ObjectIdentifier(renderer as AnyObject)
-        lock.withLock { localRenderers[id] = renderer }
-    }
-
-    public func removeLocalAudioRenderer(_ renderer: RTCAudioRenderer) {
-        let id = ObjectIdentifier(renderer as AnyObject)
-        lock.withLock { _ = localRenderers.removeValue(forKey: id) }
-    }
-
-    /// Dispatch a captured PCM frame to all registered local renderers.
-    func dispatchLocalPCM(_ buffer: AVAudioPCMBuffer) {
-        let snapshot = lock.withLock { Array(localRenderers.values) }
-        for renderer in snapshot {
-            renderer.renderPCMBuffer(buffer)
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - RTCAudioRenderer protocol extension (Lynx compat shim)
-// ─────────────────────────────────────────────────────────────────────────────
-
-// The official WebRTC iOS SDK uses `renderPCMBuffer` on RTCAudioRenderer.
-// This matches the interface used throughout this file.
-// No extension needed — already part of the protocol in livekit-ios-webrtc.
+// The canonical audio processing manager is LKLynxAudioProcessingManager (Obj-C).
+// See ios/audio/LKLynxAudioProcessingManager.h for the full interface.

@@ -159,7 +159,7 @@ public final class LynxAudioModule: NSObject {
         Task {
             if pcId == Self.localPcId {
                 // Local mic — route through audio processing pipeline
-                LynxAudioProcessingManager.shared.addLocalAudioRenderer(renderer)
+                LKLynxAudioProcessingManager.sharedInstance().addLocalAudioRenderer(renderer)
             } else {
                 guard let track = await TrackRegistry.shared.getAudioTrack(
                     pcId: pcId,
@@ -181,7 +181,7 @@ public final class LynxAudioModule: NSObject {
         guard let renderer = rendererManager.renderer(forTag: rendererTag) else { return }
         Task {
             if pcId == Self.localPcId {
-                LynxAudioProcessingManager.shared.removeLocalAudioRenderer(renderer)
+                LKLynxAudioProcessingManager.sharedInstance().removeLocalAudioRenderer(renderer)
             } else {
                 guard let track = await TrackRegistry.shared.getAudioTrack(
                     pcId: pcId,
@@ -209,29 +209,4 @@ enum LynxWebRTCDefaults {
     static var defaultRemoteAudioVolume: Double = 1.0
 }
 
-// MARK: - LynxAudioRendererManager
-
-/// Thread-safe registry of active RTCAudioRenderer instances.
-final class LynxAudioRendererManager: @unchecked Sendable {
-
-    private let lock = NSLock()
-    private var renderers: [String: RTCAudioRenderer] = [:]
-
-    func register(_ renderer: RTCAudioRenderer) -> String {
-        let tag = UUID().uuidString
-        lock.withLock { renderers[tag] = renderer }
-        return tag
-    }
-
-    func unregister(forTag tag: String) {
-        lock.withLock { _ = renderers.removeValue(forKey: tag) }
-    }
-
-    func unregisterAndDetach(forTag tag: String) {
-        lock.withLock { _ = renderers.removeValue(forKey: tag) }
-    }
-
-    func renderer(forTag tag: String) -> RTCAudioRenderer? {
-        lock.withLock { renderers[tag] }
-    }
-}
+// LynxAudioRendererManager is defined in audio/LynxAudioRendererManager.swift

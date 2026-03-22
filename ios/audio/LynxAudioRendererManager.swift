@@ -34,6 +34,11 @@ public final class LynxAudioRendererManager: @unchecked Sendable {
         lock.withLock { _ = renderers.removeValue(forKey: tag) }
     }
 
+    public func unregisterAndDetach(forTag tag: String) {
+        // Removes the renderer; the caller is responsible for detaching from the track.
+        lock.withLock { _ = renderers.removeValue(forKey: tag) }
+    }
+
     public func renderer(forTag tag: String) -> RTCAudioRenderer? {
         lock.withLock { renderers[tag] }
     }
