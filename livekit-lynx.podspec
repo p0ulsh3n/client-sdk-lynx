@@ -27,9 +27,6 @@ Pod::Spec.new do |s|
     'HEADER_SEARCH_PATHS'          => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)'
   }
 
-  # Ensure C++17 even if pod_target_xcconfig is overridden
-  s.compiler_flags = '-std=c++17'
-
   # Lynx SDK — provided by the host app
   s.dependency "Lynx"
 

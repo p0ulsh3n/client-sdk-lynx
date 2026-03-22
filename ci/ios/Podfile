@@ -4,3 +4,14 @@ use_frameworks!
 target 'ci' do
   pod 'livekit-lynx', :path => '../..'
 end
+
+# ── Ensure C++17 on ALL pods (Lynx / PrimJS headers include <memory>) ──────
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      config.build_settings['CLANG_CXX_LIBRARY']           = 'libc++'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']   = '14.0'
+    end
+  end
+end
