@@ -1,8 +1,8 @@
 # client-sdk-lynx
 
-[![CI](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/ci.yml)
-[![iOS](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/ios.yml/badge.svg)](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/ios.yml)
-[![Android](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/android.yml/badge.svg)](https://github.com/YOUR_USERNAME/client-sdk-lynx/actions/workflows/android.yml)
+[![CI](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ci.yml)
+[![iOS](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ios.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ios.yml)
+[![Android](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/android.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/android.yml)
 
 > **LiveKit SDK for [Lynx](https://lynxjs.org) (ReactLynx)** — real-time video, audio and data.
 >
