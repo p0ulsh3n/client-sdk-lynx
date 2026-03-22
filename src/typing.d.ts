@@ -12,8 +12,24 @@ export type Callback<E = string | null, R = any> = (error: E, result: R) => void
 // Declared in global scope so tsc finds it regardless of jsxImportSource.
 declare global {
   namespace JSX {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    interface IntrinsicElements { [name: string]: any }
+    // Explicit entries + catch-all — needed for TS 5.5+ with jsxImportSource
+    // (catch-all alone is not always picked up for custom native tags)
+    interface IntrinsicElements {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      view: { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      'livekit-webrtc-view': { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      text: { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      image: { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      input: { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      'scroll-view': { [key: string]: any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [name: string]: any;
+    }
   }
 
   // eslint-disable-next-line no-var

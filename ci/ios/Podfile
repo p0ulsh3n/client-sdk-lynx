@@ -2,5 +2,5 @@ platform :ios, '14.0'
 use_frameworks!
 
 target 'ci' do
-  pod 'livekit-lynx', :path => '../../../'
+  pod 'livekit-lynx', :path => '../..'
 end

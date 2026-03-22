@@ -49,7 +49,9 @@ jobs:
 
       - name: Compile Android (Debug)
         working-directory: ./ci/android/
-        run: ./gradlew assembleDebug
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
   ios-compile:
     runs-on: macos-latest
