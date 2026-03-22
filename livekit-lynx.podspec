@@ -33,8 +33,6 @@ Pod::Spec.new do |s|
     'CLANG_CXX_LANGUAGE_STANDARD'                           => 'gnu++17',
     'CLANG_CXX_LIBRARY'                                     => 'libc++',
     'HEADER_SEARCH_PATHS'                                   => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)',
-    'SWIFT_OBJC_INTEROP_MODE'                               => 'objcxx',
-    'OTHER_SWIFT_FLAGS'                                      => '$(inherited) -cxx-interoperability-mode=default',
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'
   }
 
