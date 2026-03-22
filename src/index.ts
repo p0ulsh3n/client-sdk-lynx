@@ -1,12 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // @livekit/lynx — src/index.ts
-// Single entry point. Call registerGlobals() ONCE before any LiveKit code.
+// Call registerGlobals() ONCE before any LiveKit code.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import 'well-known-symbols/Symbol.asyncIterator/auto';
-import 'well-known-symbols/Symbol.iterator/auto';
 import './polyfills/MediaRecorderShim';
-
 import type { LiveKitReactNativeInfo } from 'livekit-client';
 import { RTCPeerConnection } from './RTCPeerConnection';
 import { RTCSessionDescription, RTCIceCandidate } from './RTCSessionDescription';
@@ -16,23 +13,16 @@ import { RTCDataChannel } from './RTCDataChannel';
 import { getUserMedia, enumerateDevices, type MediaStreamConstraints } from './getUserMedia';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// registerGlobals
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface RegisterGlobalsOptions {
   autoConfigureAudioSession?: boolean;
 }
 
 export function registerGlobals(options: RegisterGlobalsOptions = {}): void {
   const { autoConfigureAudioSession = true } = options;
-
   _injectWebRTCGlobals();
   _injectMediaDevices(autoConfigureAudioSession);
   _injectLiveKitPlatformGlobal();
   _shimCryptoUUID();
-  _shimWebStreams();
-  _shimPromiseAllSettled();
-  _shimArrayAt();
 }
 
 function _injectWebRTCGlobals(): void {
@@ -48,7 +38,8 @@ function _injectWebRTCGlobals(): void {
 
 function _injectMediaDevices(autoConfigureAudio: boolean): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nav = (globalThis as any).navigator ?? {};
+  const g = globalThis as any;
+  const nav = g.navigator ?? {};
   nav.mediaDevices = {
     getUserMedia: async (constraints: MediaStreamConstraints) => {
       if (autoConfigureAudio && constraints.audio && SystemInfo?.platform === 'ios') {
@@ -69,8 +60,7 @@ function _injectMediaDevices(autoConfigureAudio: boolean): void {
       frameRate: true, echoCancellation: true, noiseSuppression: true, autoGainControl: true,
     }),
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).navigator = nav;
+  g.navigator = nav;
 }
 
 function _injectLiveKitPlatformGlobal(): void {
@@ -95,35 +85,9 @@ function _shimCryptoUUID(): void {
   }
 }
 
-function _shimWebStreams(): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const g = globalThis as any;
-  if (typeof g.WritableStream === 'undefined') {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { WritableStream, ReadableStream } = require('web-streams-polyfill') as typeof import('web-streams-polyfill');
-      g.WritableStream ??= WritableStream;
-      g.ReadableStream ??= ReadableStream;
-    } catch { /* optional */ }
-  }
-}
-
-function _shimPromiseAllSettled(): void {
-  if (typeof Promise.allSettled === 'function') return;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  (require('promise.allsettled') as { shim: () => void }).shim();
-}
-
-function _shimArrayAt(): void {
-  if (typeof Array.prototype.at === 'function') return;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  (require('array.prototype.at') as { shim: () => void }).shim();
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
-// WebRTC polyfill exports
+// Exports
 // ─────────────────────────────────────────────────────────────────────────────
-
 export { RTCPeerConnection }                   from './RTCPeerConnection';
 export { RTCSessionDescription, RTCIceCandidate } from './RTCSessionDescription';
 export { MediaStream }                         from './MediaStream';
@@ -135,17 +99,8 @@ export { RTCFrameCryptorAlgorithm }            from './e2ee/types';
 export { addListener, removeListener }         from './EventBus';
 export { LynxWebRTCModule, LynxAudioModule, LynxE2EEModule, LivekitLynxModule } from './NativeModule';
 
-export type {
-  RTCConfiguration, RTCIceServer, RTCOfferOptions, RTCAnswerOptions,
-  RTCRtpSender, RTCRtpReceiver, RTCRtpTransceiver, RTCStatsReport,
-} from './RTCPeerConnection';
-export type { TrackKind, MediaStreamTrackSettings } from './MediaStreamTrack';
 export type { MediaStreamConstraints, MediaDeviceInfo } from './getUserMedia';
 export type { RTCFrameCryptor, RTCKeyProvider, RTCKeyProviderOptions, RTCEncryptedPacket } from './e2ee/types';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SDK high-level exports
-// ─────────────────────────────────────────────────────────────────────────────
 
 export * from './hooks';
 export * from './components/BarVisualizer';
@@ -170,5 +125,5 @@ export type {
   AudioConfiguration, AppleAudioCategory, AppleAudioCategoryOption,
   AppleAudioConfiguration, AppleAudioMode, AudioTrackState, AndroidAudioTypeOptions,
 } from './audio/AudioSession';
-export type { LogLevel, SetLogLevelOptions }   from './logger';
-export type { RNKeyProviderOptions }           from './e2ee/RNKeyProvider';
+export type { LogLevel, SetLogLevelOptions }  from './logger';
+export type { RNKeyProviderOptions }          from './e2ee/RNKeyProvider';

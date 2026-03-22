@@ -238,7 +238,6 @@ class LynxRtpSender implements RTCRtpSender {
     const json = await promisify<string>((cb) =>
       LynxWebRTCModule.peerConnectionGetStats(
         this._pcId,
-        this.senderId,
         cb,
       ),
     );
@@ -267,7 +266,6 @@ class LynxRtpReceiver implements RTCRtpReceiver {
     const json = await promisify<string>((cb) =>
       LynxWebRTCModule.peerConnectionGetStats(
         this._pcId,
-        this.receiverId,
         cb,
       ),
     );
@@ -534,7 +532,7 @@ export class RTCPeerConnection extends EventTarget {
     LynxWebRTCModule.peerConnectionAddTrack(
       this._pcId,
       track.id,
-      JSON.stringify(streamIds),
+      streamIds,
       (err, senderJson) => {
         if (err || !senderJson) return;
         const json = JSON.parse(senderJson) as NativeSenderJson;
@@ -628,7 +626,6 @@ export class RTCPeerConnection extends EventTarget {
     const json = await promisify<string>((cb) =>
       LynxWebRTCModule.peerConnectionGetStats(
         this._pcId,
-        selector?.id ?? null,
         cb,
       ),
     );
@@ -828,9 +825,9 @@ export class RTCPeerConnection extends EventTarget {
     });
 
     const ev = new RTCTrackEvent('track', {
-      receiver,
-      track,
-      streams,
+      receiver: receiver as unknown as RTCRtpReceiver,
+      track: track as unknown as globalThis.MediaStreamTrack,
+      streams: streams as unknown as globalThis.MediaStream[],
       transceiver: undefined as unknown as RTCRtpTransceiver,
     });
     this.dispatchEvent(ev);

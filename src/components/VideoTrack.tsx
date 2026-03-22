@@ -26,7 +26,7 @@ import {
   useState,
   type ReactNode,
 } from '@lynx-js/react';
-import type React from '@lynx-js/react';
+import * as React from '@lynx-js/react';
 import { RemoteVideoTrack } from 'livekit-client';
 import type { TrackReference } from '@livekit/components-react';
 import LynxViewPortDetector from './LynxViewPortDetector';

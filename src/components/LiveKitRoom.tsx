@@ -20,7 +20,7 @@ import type {
 } from 'livekit-client';
 import type { MediaDeviceFailure, Room } from 'livekit-client';
 import { type ReactNode } from '@lynx-js/react';
-import type React from '@lynx-js/react';
+import * as React from '@lynx-js/react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props (100 % identical to the RN SDK)

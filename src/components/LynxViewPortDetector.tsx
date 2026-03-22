@@ -14,7 +14,7 @@ import {
   useRef,
   type RefObject,
 } from '@lynx-js/react';
-import type React from '@lynx-js/react';
+import * as React from '@lynx-js/react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props

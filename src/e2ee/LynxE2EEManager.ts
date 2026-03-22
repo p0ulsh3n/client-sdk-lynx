@@ -31,11 +31,23 @@ import {
 
 import type RNKeyProvider from './RNKeyProvider';
 
-import EventEmitter from 'events';
-import type TypedEventEmitter from 'typed-emitter';
+// Simple EventEmitter — avoids node 'events' dependency in browser/Lynx env
+class SimpleEventEmitter {
+  private _listeners: Map<string, Set<(...args: unknown[]) => void>> = new Map();
+  on(event: string, fn: (...args: unknown[]) => void) { 
+    if (!this._listeners.has(event)) this._listeners.set(event, new Set());
+    this._listeners.get(event)!.add(fn); return this;
+  }
+  off(event: string, fn: (...args: unknown[]) => void) {
+    this._listeners.get(event)?.delete(fn); return this;
+  }
+  emit(event: string, ...args: unknown[]) {
+    this._listeners.get(event)?.forEach(fn => fn(...args));
+  }
+}
 
 export default class LynxE2EEManager
-  extends (EventEmitter as new () => TypedEventEmitter<E2EEManagerCallbacks>)
+  extends SimpleEventEmitter
   implements BaseE2EEManager
 {
   private room?: Room;

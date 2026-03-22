@@ -4,22 +4,18 @@
 
 /// <reference types="@lynx-js/types" />
 
-// ── Lynx JSX elements (confirmed pattern from lynxjs.org docs) ───────────────
-// Source: https://blog.logrocket.com/how-to-build-cross-platform-mobile-applications-using-lynx-js/
-declare namespace JSX {
-  interface IntrinsicElements {
-    view: Record<string, unknown>;
-    text: Record<string, unknown>;
-    image: Record<string, unknown>;
-    input: Record<string, unknown>;
-    'scroll-view': Record<string, unknown>;
-    'livekit-webrtc-view': Record<string, unknown>;
-    // Catch-all for any other Lynx custom element
-    [elemName: string]: Record<string, unknown>;
-  }
-}
+// ── Permissive Callback type ──────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Callback<E = string | null, R = any> = (error: E, result: R) => void;
 
+// ── Lynx JSX elements ─────────────────────────────────────────────────────────
+// Declared in global scope so tsc finds it regardless of jsxImportSource.
 declare global {
+  namespace JSX {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    interface IntrinsicElements { [name: string]: any }
+  }
+
   // eslint-disable-next-line no-var
   var NativeModules: {
     LynxWebRTCModule: LynxWebRTCModuleSpec;
@@ -28,7 +24,6 @@ declare global {
     LivekitLynxModule: LivekitLynxModuleSpec;
   };
 
-  // Lynx system info injected by runtime
   // eslint-disable-next-line no-var
   var SystemInfo: {
     readonly platform: 'ios' | 'android';
@@ -36,8 +31,7 @@ declare global {
     readonly osVersion: string;
   };
 
-  // lynx object — available on background thread
-  // Source: lynxjs.org/react/thinking-in-reactlynx
+  // lynx global object — available on the Lynx background thread
   // eslint-disable-next-line no-var
   var lynx: {
     getJSModule(name: 'GlobalEventEmitter'): {
@@ -50,12 +44,12 @@ declare global {
   };
 }
 
-// ── Callback — permissive, matches all Lynx NativeModule call sites ───────────
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Callback<E = string | null, R = any> = (error: E, result: R) => void;
+// ── Module specs — all have index signature so cast to Record<string,unknown> works ──
 
-// ── LynxWebRTCModuleSpec ──────────────────────────────────────────────────────
 export interface LynxWebRTCModuleSpec {
+  // Index signature required for Proxy pattern
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: (...args: any[]) => void;
   peerConnectionInit(configJson: string, pcId: number, callback: Callback): void;
   peerConnectionClose(pcId: number, callback: Callback): void;
   peerConnectionDispose(pcId: number, callback: Callback): void;
@@ -82,16 +76,22 @@ export interface LynxWebRTCModuleSpec {
   mediaStreamRelease(streamId: string, callback: Callback): void;
   mediaStreamAddTrack(streamId: string, trackId: string, callback: Callback): void;
   mediaStreamRemoveTrack(streamId: string, trackId: string, callback: Callback): void;
+  mediaStreamToURL(streamId: string, callback: Callback): void;
   getUserMedia(constraintsJson: string, callback: Callback): void;
   enumerateDevices(callback: Callback): void;
   switchCamera(trackId: string, callback: Callback): void;
   mediaTrackStop(trackId: string, callback: Callback): void;
   mediaTrackRelease(trackId: string, callback: Callback): void;
   mediaTrackSetEnabled(trackId: string, enabled: boolean, callback: Callback): void;
+  // Aliases used in MediaStreamTrack.ts
+  mediaStreamTrackSetEnabled(trackId: string, enabled: boolean, callback: Callback): void;
+  mediaStreamTrackStop(trackId: string, callback: Callback): void;
+  mediaStreamTrackRelease(trackId: string, callback: Callback): void;
 }
 
-// ── LynxAudioModuleSpec ───────────────────────────────────────────────────────
 export interface LynxAudioModuleSpec {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: (...args: any[]) => void;
   createVolumeProcessor(pcId: number, trackId: string, callback: Callback): void;
   deleteVolumeProcessor(processorId: string, pcId: number, trackId: string, callback: Callback): void;
   createMultibandVolumeProcessor(optsJson: string, pcId: number, trackId: string, callback: Callback): void;
@@ -101,8 +101,9 @@ export interface LynxAudioModuleSpec {
   setDefaultAudioTrackVolume(volume: number, callback: Callback): void;
 }
 
-// ── LynxE2EEModuleSpec ────────────────────────────────────────────────────────
 export interface LynxE2EEModuleSpec {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: (...args: any[]) => void;
   frameCryptorCreateForSender(pcId: number, senderId: string, participantId: string, algorithm: string, keyProviderTag: string, callback: Callback): void;
   frameCryptorCreateForReceiver(pcId: number, receiverId: string, participantId: string, algorithm: string, keyProviderTag: string, callback: Callback): void;
   frameCryptorSetEnabled(cryptorTag: string, enabled: boolean, callback: Callback): void;
@@ -120,10 +121,9 @@ export interface LynxE2EEModuleSpec {
   dataPacketCryptorDecrypt(cryptorTag: string, participantId: string, packetJson: string, callback: Callback): void;
 }
 
-// ── LivekitLynxModuleSpec ─────────────────────────────────────────────────────
 export interface LivekitLynxModuleSpec {
-  // Index signature so cast to Record<string,unknown> works
-  [key: string]: (...args: unknown[]) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: (...args: any[]) => void;
   configureAudio(configJson: string, callback: Callback): void;
   startAudioSession(callback: Callback): void;
   stopAudioSession(callback: Callback): void;

@@ -17,7 +17,7 @@ import {
   useState,
   type ReactNode,
 } from '@lynx-js/react';
-import type React from '@lynx-js/react';
+import * as React from '@lynx-js/react';
 import { useMultibandTrackVolume } from '../hooks/useMultibandTrackVolume';
 
 // ─────────────────────────────────────────────────────────────────────────────
