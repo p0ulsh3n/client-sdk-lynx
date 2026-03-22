@@ -37,7 +37,7 @@ export default class RNKeyProvider extends BaseKeyProvider {
     this._ready = new Promise<void>((r) => (resolveReady = r));
 
     RTCFrameCryptorFactory.createDefaultKeyProvider(opts).then((kp) => {
-      (this as { _nativeProvider: RTCKeyProvider })._nativeProvider = kp;
+      (this as unknown as { _nativeProvider: RTCKeyProvider })._nativeProvider = kp;
       resolveReady();
     });
   }

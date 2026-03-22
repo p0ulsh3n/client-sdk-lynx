@@ -14,6 +14,7 @@ import {
   useRef,
   type RefObject,
 } from '@lynx-js/react';
+import type React from '@lynx-js/react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -49,7 +50,7 @@ export default function LynxViewPortDetector({
   propKey,
   style,
   children,
-}: LynxViewPortDetectorProps): JSX.Element {
+}: LynxViewPortDetectorProps): React.ReactElement {
   const viewRef = useRef<Element | null>(null);
   // Track last emitted value to avoid redundant callbacks
   const lastValue = useRef<boolean | null>(null);

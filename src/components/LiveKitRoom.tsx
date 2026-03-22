@@ -20,6 +20,7 @@ import type {
 } from 'livekit-client';
 import type { MediaDeviceFailure, Room } from 'livekit-client';
 import { type ReactNode } from '@lynx-js/react';
+import type React from '@lynx-js/react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props (100 % identical to the RN SDK)
@@ -119,8 +120,8 @@ export interface LiveKitRoomProps {
  */
 export function LiveKitRoom(
   props: LiveKitRoomProps,
-): JSX.Element {
-  const { room } = useLiveKitRoom(props);
+): React.ReactElement {
+  const { room } = useLiveKitRoom(props as Parameters<typeof useLiveKitRoom>[0]);
 
   // @livekit/components-react uses React.Fragment and Context providers.
   // These are JS-pure and work identically in @lynx-js/react.

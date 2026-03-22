@@ -28,7 +28,6 @@
   "scripts": {
     "typescript": "tsc --noemit -p tsconfig.build.json",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepare": "bob build",
     "release": "release-it",
     "pods": "cd example && pod install --project-directory=ios",
     "bootstrap": "yarn && yarn pods"
@@ -73,32 +72,6 @@
     "@lynx-js/react": "^0.116.0",
     "livekit-client": "^2.15.0",
     "typescript": "^5.5.0",
-    "eslint": "^9.0.0",
-    "react-native-builder-bob": "^0.32.0"
-  },
-  "jest": {
-    "preset": "react-native",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ]
-  },
-  "react-native-builder-bob": {
-    "source": "src",
-    "output": "lib",
-    "targets": [
-      "commonjs",
-      "module",
-      [
-        "typescript",
-        {
-          "project": "tsconfig.build.json"
-        }
-      ]
-    ]
+    "eslint": "^9.0.0"
   }
 }

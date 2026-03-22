@@ -17,6 +17,7 @@ import {
   useMemo,
   useState,
 } from '@lynx-js/react';
+import type React from '@lynx-js/react';
 import { RemoteVideoTrack } from 'livekit-client';
 import LynxViewPortDetector from './LynxViewPortDetector';
 
@@ -40,10 +41,10 @@ export const VideoView = ({
   objectFit = 'cover',
   zOrder,
   mirror,
-}: Props): JSX.Element => {
+}: Props): React.ReactElement => {
   const [elementInfo] = useState(() => {
     const info = new VideoViewElementInfo();
-    info.id = videoTrack?.sid;
+    info.id = videoTrack?.sid ?? undefined;
     return info;
   });
 
@@ -69,14 +70,14 @@ export const VideoView = ({
   );
 
   const [streamURL, setStreamURL] = useState(
-    videoTrack?.mediaStream?.toURL?.() ?? '',
+    (videoTrack?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '',
   );
 
   useEffect(() => {
-    setStreamURL(videoTrack?.mediaStream?.toURL?.() ?? '');
+    setStreamURL((videoTrack?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '');
     if (videoTrack instanceof LocalVideoTrack) {
       const onRestarted = (track: Track | null) => {
-        setStreamURL(track?.mediaStream?.toURL?.() ?? '');
+        setStreamURL((track?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '');
       };
       videoTrack.on(TrackEvent.Restarted, onRestarted);
       return () => { videoTrack.off(TrackEvent.Restarted, onRestarted); };
@@ -133,8 +134,8 @@ class VideoViewElementInfo implements ElementInfo {
   visible = true;
   visibilityChangedAt: number | undefined;
   pictureInPicture = false;
-  handleResize?: (() => void) | undefined;
-  handleVisibilityChanged?: (() => void) | undefined;
+  handleResize: () => void = () => {};
+  handleVisibilityChanged: () => void = () => {};
 
   width  = (): number => this._width;
   height = (): number => this._height;
@@ -145,14 +146,14 @@ class VideoViewElementInfo implements ElementInfo {
   onLayout(width: number, height: number): void {
     this._width  = width;
     this._height = height;
-    if (this._observing) this.handleResize?.();
+    if (this._observing) this.handleResize();
   }
 
   onVisibility(isVisible: boolean): void {
     if (this.visible !== isVisible) {
       this.visible = isVisible;
       this.visibilityChangedAt = Date.now();
-      if (this._observing) this.handleVisibilityChanged?.();
+      if (this._observing) this.handleVisibilityChanged();
     }
   }
 }

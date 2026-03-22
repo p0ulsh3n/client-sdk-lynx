@@ -17,6 +17,7 @@ import {
   useState,
   type ReactNode,
 } from '@lynx-js/react';
+import type React from '@lynx-js/react';
 import { useMultibandTrackVolume } from '../hooks/useMultibandTrackVolume';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -85,7 +86,7 @@ export function BarVisualizer({
   barCount = 5,
   trackRef,
   options,
-}: BarVisualizerProps): JSX.Element {
+}: BarVisualizerProps): React.ReactElement {
   let trackReference = useMaybeTrackRefContext();
   if (trackRef) trackReference = trackRef;
 
@@ -178,7 +179,7 @@ export function useBarAnimator(
 
     const animate = (time: number) => {
       if (time - startTime >= interval) {
-        setIndex((prev) => prev + 1);
+        setIndex((prev: number) => prev + 1);
         startTime = time;
       }
       animFrameRef.current = requestAnimationFrame(animate);

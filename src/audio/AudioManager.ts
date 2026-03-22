@@ -63,11 +63,11 @@ export function useIOSAudioManagement(
     if (SystemInfo?.platform !== 'ios') return;
 
     const onLocalPublished = (pub: LocalTrackPublication) => {
-      if (pub.kind === 'audio') setLocalTrackCount((c) => c + 1);
+      if (pub.kind === 'audio') setLocalTrackCount((c: number) => c + 1);
     };
     const onLocalUnpublished = (pub: LocalTrackPublication) => {
       if (pub.kind === 'audio') {
-        setLocalTrackCount((c) => {
+        setLocalTrackCount((c: number) => {
           if (c - 1 < 0) {
             log.warn('[@livekit/lynx] local audio track count below zero');
           }
@@ -76,11 +76,11 @@ export function useIOSAudioManagement(
       }
     };
     const onRemotePublished = (pub: RemoteTrackPublication) => {
-      if (pub.kind === 'audio') setRemoteTrackCount((c) => c + 1);
+      if (pub.kind === 'audio') setRemoteTrackCount((c: number) => c + 1);
     };
     const onRemoteUnpublished = (pub: RemoteTrackPublication) => {
       if (pub.kind === 'audio') {
-        setRemoteTrackCount((c) => {
+        setRemoteTrackCount((c: number) => {
           if (c - 1 < 0) {
             log.warn('[@livekit/lynx] remote audio track count below zero');
           }

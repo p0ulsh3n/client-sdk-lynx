@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { LynxE2EEModule, promisify } from '../NativeModule';
-import type {
+import {
   RTCEncryptedPacket,
   RTCFrameCryptor,
   RTCFrameCryptorAlgorithm,
@@ -15,6 +15,10 @@ import type {
   RTCRtpSenderHandle,
   RTCDataPacketCryptor,
 } from './types';
+
+// Re-export all types so LynxE2EEManager can import them from this file
+export type { RTCEncryptedPacket, RTCFrameCryptor, RTCKeyProvider, RTCKeyProviderOptions, RTCRtpReceiverHandle, RTCRtpSenderHandle, RTCDataPacketCryptor } from './types';
+export { RTCFrameCryptorAlgorithm } from './types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LynxFrameCryptor

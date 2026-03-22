@@ -30,7 +30,7 @@ import {
 } from 'livekit-client';
 
 import type RNKeyProvider from './RNKeyProvider';
-import type RTCEngine from 'livekit-client/dist/src/room/RTCEngine';
+
 import EventEmitter from 'events';
 import type TypedEventEmitter from 'typed-emitter';
 
@@ -130,7 +130,8 @@ export default class LynxE2EEManager
     return { uuid: '', payload: decrypted };
   }
 
-  setupEngine(_engine: RTCEngine): void {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setupEngine(_engine: any): void {}
 
   setParticipantCryptorEnabled(enabled: boolean, participantIdentity: string): void {
     if (this.encryptionEnabled !== enabled && participantIdentity === this.room?.localParticipant.identity) {

@@ -2,20 +2,20 @@
 // @livekit/lynx — src/LKNativeLynxModule.ts
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { LivekitLynxModuleSpec } from './typing';
+
 const LINKING_ERROR =
   `[@livekit/lynx] Native module "LivekitLynxModule" is not linked.\n` +
-  `Ensure you registered LivekitLynxModule in your Lynx app setup:\n` +
-  `  iOS:     [globalConfig registerModule:LivekitLynxModule.class]\n` +
-  `  Android: LynxEnv.inst().registerModule("LivekitLynxModule", LivekitLynxModule::class.java)`;
+  `Register LivekitLynxModule in your Lynx app setup.`;
 
-export const LivekitLynxModule: typeof NativeModules['LivekitLynxModule'] = new Proxy(
-  {} as typeof NativeModules['LivekitLynxModule'],
+export const LivekitLynxModule: LivekitLynxModuleSpec = new Proxy(
+  {} as LivekitLynxModuleSpec,
   {
     get(_target, prop: string) {
       if (typeof NativeModules === 'undefined' || !NativeModules.LivekitLynxModule) {
         throw new Error(LINKING_ERROR);
       }
-      return (NativeModules.LivekitLynxModule as Record<string, unknown>)[prop];
+      return (NativeModules.LivekitLynxModule as unknown as Record<string, unknown>)[prop];
     },
   },
 );

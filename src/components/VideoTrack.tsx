@@ -26,6 +26,7 @@ import {
   useState,
   type ReactNode,
 } from '@lynx-js/react';
+import type React from '@lynx-js/react';
 import { RemoteVideoTrack } from 'livekit-client';
 import type { TrackReference } from '@livekit/components-react';
 import LynxViewPortDetector from './LynxViewPortDetector';
@@ -70,12 +71,12 @@ export const VideoTrack = forwardRef<unknown, VideoTrackProps>(
       zOrder,
       mirror,
     }: VideoTrackProps,
-    ref,
+    ref: React.ForwardedRef<unknown>,
   ) => {
     // ── ElementInfo for adaptive stream ─────────────────────────────────────
     const [elementInfo] = useState(() => {
       const info = new VideoTrackElementInfo();
-      info.id = trackRef?.publication?.trackSid;
+      info.id = trackRef?.publication?.trackSid ?? undefined;
       return info;
     });
 
@@ -107,15 +108,15 @@ export const VideoTrack = forwardRef<unknown, VideoTrackProps>(
 
     // ── Sync MediaStream URL ────────────────────────────────────────────────
     const [streamURL, setStreamURL] = useState(
-      videoTrack?.mediaStream?.toURL?.() ?? '',
+      (videoTrack?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '',
     );
 
     useEffect(() => {
-      setStreamURL(videoTrack?.mediaStream?.toURL?.() ?? '');
+      setStreamURL((videoTrack?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '');
 
       if (videoTrack instanceof LocalVideoTrack) {
         const onRestarted = (track: Track | null) => {
-          setStreamURL(track?.mediaStream?.toURL?.() ?? '');
+          setStreamURL((track?.mediaStream as unknown as { toURL?: () => string })?.toURL?.() ?? '');
         };
         videoTrack.on(TrackEvent.Restarted, onRestarted);
         return () => { videoTrack.off(TrackEvent.Restarted, onRestarted); };
@@ -194,8 +195,8 @@ class VideoTrackElementInfo implements ElementInfo {
   visible = true;
   visibilityChangedAt: number | undefined;
   pictureInPicture = false;
-  handleResize?: (() => void) | undefined;
-  handleVisibilityChanged?: (() => void) | undefined;
+  handleResize: () => void = () => {};
+  handleVisibilityChanged: () => void = () => {};
 
   width  = (): number => this._width;
   height = (): number => this._height;
@@ -207,14 +208,14 @@ class VideoTrackElementInfo implements ElementInfo {
   onLayout(width: number, height: number): void {
     this._width  = width;
     this._height = height;
-    if (this._observing) this.handleResize?.();
+    if (this._observing) this.handleResize();
   }
 
   onVisibility(isVisible: boolean): void {
     if (this.visible !== isVisible) {
       this.visible = isVisible;
       this.visibilityChangedAt = Date.now();
-      if (this._observing) this.handleVisibilityChanged?.();
+      if (this._observing) this.handleVisibilityChanged();
     }
   }
 }

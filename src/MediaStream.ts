@@ -65,7 +65,7 @@ export class MediaStream extends EventTarget {
 
     LynxWebRTCModule.mediaStreamAddTrack(this.id, track.id, () => {});
 
-    const ev = new MediaStreamTrackEvent('addtrack', { track });
+    const ev = new MediaStreamTrackEvent('addtrack', { track: track as unknown as globalThis.MediaStreamTrack });
     this.dispatchEvent(ev);
     this.onaddtrack?.(ev);
   }
@@ -76,7 +76,7 @@ export class MediaStream extends EventTarget {
 
     LynxWebRTCModule.mediaStreamRemoveTrack(this.id, track.id, () => {});
 
-    const ev = new MediaStreamTrackEvent('removetrack', { track });
+    const ev = new MediaStreamTrackEvent('removetrack', { track: track as unknown as globalThis.MediaStreamTrack });
     this.dispatchEvent(ev);
     this.onremovetrack?.(ev);
   }

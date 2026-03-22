@@ -1,27 +1,20 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — EventBus.ts
-// Wrapper around Lynx's official GlobalEventEmitter global.
+// @livekit/lynx — src/EventBus.ts
+// Wrapper around Lynx's GlobalEventEmitter.
 //
-// Native modules emit events via:
-//   Android: lynxContext.sendGlobalEvent("EVENT_NAME", jsonPayload)
-//   iOS:     [self.context sendGlobalEvent:@"EVENT_NAME" withParams:dict]
+// The correct API per official Lynx docs (lynxjs.org/react/thinking-in-reactlynx):
+//   lynx.getJSModule('GlobalEventEmitter').addListener(name, handler)
+//   lynx.getJSModule('GlobalEventEmitter').removeListener(name, handler)
 //
-// JS receives via GlobalEventEmitter (official Lynx global):
-//   GlobalEventEmitter.addListener('EVENT_NAME', handler)
-//   GlobalEventEmitter.removeListener('EVENT_NAME', handler)
-//
-// Official docs: https://lynxjs.org/api/lynx-native-api/lynx-context/send-global-event
+// Must be used inside useEffect (background-only code).
+// Native side emits via: LynxContext.sendGlobalEvent(name, data)
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** All native event names emitted by livekit-lynx-webrtc native modules. */
 export const NATIVE_EVENTS = [
-  // WebRTC PeerConnection events (prefixed with pcId for routing)
   'LK_PC_EVENT',
-  // Audio processing events
   'LK_VOLUME_PROCESSED',
   'LK_MULTIBAND_PROCESSED',
   'LK_AUDIO_DATA',
-  // E2EE events
   'LK_E2EE_EVENT',
 ] as const;
 
@@ -29,74 +22,49 @@ export type NativeEventName = (typeof NATIVE_EVENTS)[number];
 
 type Handler = (data: unknown) => void;
 
-/** Per-listener subscriptions, keyed by opaque listener token. */
-const _subs = new Map<
-  object,
-  Array<{ event: string; handler: Handler }>
->();
+/** Per-listener subscriptions keyed by opaque token. */
+const _subs = new Map<object, Array<{ event: string; wrapped: (raw: string) => void }>>();
 
-/**
- * Internal event map — JS-side (deserialized) event handlers.
- * Multiple listeners can subscribe to the same event name.
- */
+/** Parsed handler sets per event name. */
 const _handlers = new Map<string, Set<Handler>>();
 
-/** Whether we've already attached to GlobalEventEmitter for each event. */
-const _attached = new Set<string>();
+/** Raw handlers registered on GlobalEventEmitter per event. */
+const _rawHandlers = new Map<string, (raw: string) => void>();
+
+function getEmitter() {
+  // Official Lynx API — only available on the background thread
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (lynx as any).getJSModule('GlobalEventEmitter') as {
+    addListener(event: string, handler: (data: string) => void): void;
+    removeListener(event: string, handler: (data: string) => void): void;
+  };
+}
 
 function ensureAttached(event: string): void {
-  if (_attached.has(event)) return;
-  _attached.add(event);
+  if (_rawHandlers.has(event)) return;
 
-  // Lynx official GlobalEventEmitter — receives events from sendGlobalEvent()
-  const rawHandler = (raw: string) => {
-    let data: unknown;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      data = raw;
-    }
-    _handlers.get(event)?.forEach((fn) => fn(data));
+  const raw = (data: string) => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(data); } catch { parsed = data; }
+    _handlers.get(event)?.forEach((fn) => fn(parsed));
   };
-
-  // Use the official Lynx GlobalEventEmitter API
-  GlobalEventEmitter.addListener(event, rawHandler);
+  _rawHandlers.set(event, raw);
+  getEmitter().addListener(event, raw);
 }
 
-/**
- * Add an event listener for a native event.
- *
- * @param listenerToken  Opaque token used to remove all listeners at once.
- * @param event          Native event name (must be in NATIVE_EVENTS).
- * @param handler        Called with the deserialized event payload.
- */
-export function addListener(
-  listenerToken: object,
-  event: string,
-  handler: Handler,
-): void {
+export function addListener(token: object, event: string, handler: Handler): void {
   ensureAttached(event);
-
-  if (!_handlers.has(event)) {
-    _handlers.set(event, new Set());
-  }
+  if (!_handlers.has(event)) _handlers.set(event, new Set());
   _handlers.get(event)!.add(handler);
-
-  if (!_subs.has(listenerToken)) {
-    _subs.set(listenerToken, []);
-  }
-  _subs.get(listenerToken)!.push({ event, handler });
+  if (!_subs.has(token)) _subs.set(token, []);
+  _subs.get(token)!.push({ event, wrapped: handler as (raw: string) => void });
 }
 
-/**
- * Remove all event listeners registered under a given token.
- */
-export function removeListener(listenerToken: object): void {
-  const entries = _subs.get(listenerToken);
+export function removeListener(token: object): void {
+  const entries = _subs.get(token);
   if (!entries) return;
-
-  for (const { event, handler } of entries) {
-    _handlers.get(event)?.delete(handler);
+  for (const { event, wrapped } of entries) {
+    _handlers.get(event)?.delete(wrapped as Handler);
   }
-  _subs.delete(listenerToken);
+  _subs.delete(token);
 }

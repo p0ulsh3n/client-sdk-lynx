@@ -1,16 +1,25 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — typing.d.ts
-// Global NativeModules declarations for the Lynx runtime.
-// Drop this file into src/ of your Lynx project.
+// @livekit/lynx — src/typing.d.ts
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// <reference types="@lynx-js/types" />
 
+// ── Lynx JSX elements (confirmed pattern from lynxjs.org docs) ───────────────
+// Source: https://blog.logrocket.com/how-to-build-cross-platform-mobile-applications-using-lynx-js/
+declare namespace JSX {
+  interface IntrinsicElements {
+    view: Record<string, unknown>;
+    text: Record<string, unknown>;
+    image: Record<string, unknown>;
+    input: Record<string, unknown>;
+    'scroll-view': Record<string, unknown>;
+    'livekit-webrtc-view': Record<string, unknown>;
+    // Catch-all for any other Lynx custom element
+    [elemName: string]: Record<string, unknown>;
+  }
+}
+
 declare global {
-  /**
-   * Lynx injects `NativeModules` as a global object in the background thread.
-   * Each key is a registered native module name.
-   */
   // eslint-disable-next-line no-var
   var NativeModules: {
     LynxWebRTCModule: LynxWebRTCModuleSpec;
@@ -19,351 +28,108 @@ declare global {
     LivekitLynxModule: LivekitLynxModuleSpec;
   };
 
-  /**
-   * Lynx GlobalEventEmitter — the official Lynx global for receiving events
-   * sent by native modules via `LynxContext.sendGlobalEvent(name, data)`.
-   *
-   * Source: https://lynxjs.org/api/lynx-native-api/lynx-context/send-global-event
-   *
-   * Usage in ReactLynx JS:
-   *   GlobalEventEmitter.addListener('MY_EVENT', handler);
-   *   GlobalEventEmitter.removeListener('MY_EVENT', handler);
-   */
-  // eslint-disable-next-line no-var
-  var GlobalEventEmitter: {
-    addListener(event: string, handler: (data: string) => void): void;
-    removeListener(event: string, handler: (data: string) => void): void;
-  };
-
-  /** Lynx system information injected by the runtime. */
+  // Lynx system info injected by runtime
   // eslint-disable-next-line no-var
   var SystemInfo: {
     readonly platform: 'ios' | 'android';
     readonly pixelRatio: number;
     readonly osVersion: string;
   };
+
+  // lynx object — available on background thread
+  // Source: lynxjs.org/react/thinking-in-reactlynx
+  // eslint-disable-next-line no-var
+  var lynx: {
+    getJSModule(name: 'GlobalEventEmitter'): {
+      addListener(event: string, handler: (data: string) => void): void;
+      removeListener(event: string, handler: (data: string) => void): void;
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getJSModule(name: string): any;
+    reload(): void;
+  };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxWebRTCModule — RTCPeerConnection, MediaStream, getUserMedia bridge
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Callback — permissive, matches all Lynx NativeModule call sites ───────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Callback<E = string | null, R = any> = (error: E, result: R) => void;
 
-type Callback<E = string | null, R = string | null> = (
-  error: E,
-  result: R,
-) => void;
-
-interface LynxWebRTCModuleSpec {
-  // ── PeerConnection lifecycle ──────────────────────────────────────────────
-  peerConnectionInit(
-    configJson: string,
-    pcId: number,
-    callback: Callback,
-  ): void;
+// ── LynxWebRTCModuleSpec ──────────────────────────────────────────────────────
+export interface LynxWebRTCModuleSpec {
+  peerConnectionInit(configJson: string, pcId: number, callback: Callback): void;
   peerConnectionClose(pcId: number, callback: Callback): void;
   peerConnectionDispose(pcId: number, callback: Callback): void;
-
-  // ── SDP ───────────────────────────────────────────────────────────────────
-  peerConnectionCreateOffer(
-    pcId: number,
-    constraintsJson: string,
-    callback: Callback,
-  ): void;
-  peerConnectionCreateAnswer(
-    pcId: number,
-    constraintsJson: string,
-    callback: Callback,
-  ): void;
-  peerConnectionSetLocalDescription(
-    pcId: number,
-    sdpJson: string,
-    callback: Callback,
-  ): void;
-  peerConnectionSetRemoteDescription(
-    pcId: number,
-    sdpJson: string,
-    callback: Callback,
-  ): void;
-
-  // ── ICE ───────────────────────────────────────────────────────────────────
-  peerConnectionAddICECandidate(
-    pcId: number,
-    candidateJson: string,
-    callback: Callback,
-  ): void;
-
-  // ── Tracks / Senders ──────────────────────────────────────────────────────
-  peerConnectionAddTrack(
-    pcId: number,
-    trackId: string,
-    streamIdsJson: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  peerConnectionRemoveTrack(
-    pcId: number,
-    senderId: string,
-    callback: Callback,
-  ): void;
-  peerConnectionGetSenders(
-    pcId: number,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  peerConnectionGetReceivers(
-    pcId: number,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  peerConnectionGetTransceivers(
-    pcId: number,
-    callback: Callback<string | null, string | null>,
-  ): void;
-
-  // ── DataChannel ───────────────────────────────────────────────────────────
-  createDataChannel(
-    pcId: number,
-    label: string,
-    configJson: string,
-    callback: Callback,
-  ): void;
-  dataChannelSend(
-    pcId: number,
-    channelId: number,
-    data: string,
-    isBinary: boolean,
-    callback: Callback,
-  ): void;
-  dataChannelClose(
-    pcId: number,
-    channelId: number,
-    callback: Callback,
-  ): void;
-
-  // ── Stats ─────────────────────────────────────────────────────────────────
-  peerConnectionGetStats(
-    pcId: number,
-    trackId: string | null,
-    callback: Callback<string | null, string | null>,
-  ): void;
-
-  // ── MediaStream ───────────────────────────────────────────────────────────
-  mediaStreamCreate(
-    streamId: string,
-    callback: Callback,
-  ): void;
+  peerConnectionCreateOffer(pcId: number, constraintsJson: string, callback: Callback): void;
+  peerConnectionCreateAnswer(pcId: number, constraintsJson: string, callback: Callback): void;
+  peerConnectionSetLocalDescription(pcId: number, sdpJson: string, callback: Callback): void;
+  peerConnectionSetRemoteDescription(pcId: number, sdpJson: string, callback: Callback): void;
+  peerConnectionAddICECandidate(pcId: number, candidateJson: string, callback: Callback): void;
+  peerConnectionGetStats(pcId: number, callback: Callback): void;
+  peerConnectionAddTrack(pcId: number, trackId: string, streamIds: string[], callback: Callback): void;
+  peerConnectionRemoveTrack(pcId: number, senderId: string, callback: Callback): void;
+  peerConnectionGetSenders(pcId: number, callback: Callback): void;
+  peerConnectionGetReceivers(pcId: number, callback: Callback): void;
+  peerConnectionGetTransceivers(pcId: number, callback: Callback): void;
+  senderGetParameters(pcId: number, senderId: string, callback: Callback): void;
+  senderSetParameters(pcId: number, senderId: string, paramsJson: string, callback: Callback): void;
+  senderReplaceTrack(pcId: number, senderId: string, trackId: string | null, callback: Callback): void;
+  transceiverSetDirection(pcId: number, transceiverId: string, direction: string, callback: Callback): void;
+  transceiverStop(pcId: number, transceiverId: string, callback: Callback): void;
+  createDataChannel(pcId: number, label: string, initJson: string, callback: Callback): void;
+  dataChannelSend(pcId: number, channelId: number, data: string, isBinary: boolean, callback: Callback): void;
+  dataChannelClose(pcId: number, channelId: number, callback: Callback): void;
+  mediaStreamCreate(streamId: string, callback: Callback): void;
   mediaStreamRelease(streamId: string, callback: Callback): void;
-  mediaStreamAddTrack(
-    streamId: string,
-    trackId: string,
-    callback: Callback,
-  ): void;
-  mediaStreamRemoveTrack(
-    streamId: string,
-    trackId: string,
-    callback: Callback,
-  ): void;
-  mediaStreamToURL(
-    streamId: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-
-  // ── MediaStreamTrack ──────────────────────────────────────────────────────
-  mediaStreamTrackSetEnabled(
-    trackId: string,
-    enabled: boolean,
-    callback: Callback,
-  ): void;
-  mediaStreamTrackStop(trackId: string, callback: Callback): void;
-  mediaStreamTrackRelease(trackId: string, callback: Callback): void;
-
-  // ── getUserMedia / enumerateDevices ───────────────────────────────────────
-  getUserMedia(
-    constraintsJson: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  enumerateDevices(
-    callback: Callback<string | null, string | null>,
-  ): void;
-
-  // ── Sender parameters ─────────────────────────────────────────────────────
-  senderGetParameters(
-    pcId: number,
-    senderId: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  senderSetParameters(
-    pcId: number,
-    senderId: string,
-    parametersJson: string,
-    callback: Callback,
-  ): void;
-  senderReplaceTrack(
-    pcId: number,
-    senderId: string,
-    trackId: string | null,
-    callback: Callback,
-  ): void;
-
-  // ── Transceiver ───────────────────────────────────────────────────────────
-  transceiverSetDirection(
-    pcId: number,
-    transceiverId: string,
-    direction: string,
-    callback: Callback,
-  ): void;
-  transceiverStop(
-    pcId: number,
-    transceiverId: string,
-    callback: Callback,
-  ): void;
+  mediaStreamAddTrack(streamId: string, trackId: string, callback: Callback): void;
+  mediaStreamRemoveTrack(streamId: string, trackId: string, callback: Callback): void;
+  getUserMedia(constraintsJson: string, callback: Callback): void;
+  enumerateDevices(callback: Callback): void;
+  switchCamera(trackId: string, callback: Callback): void;
+  mediaTrackStop(trackId: string, callback: Callback): void;
+  mediaTrackRelease(trackId: string, callback: Callback): void;
+  mediaTrackSetEnabled(trackId: string, enabled: boolean, callback: Callback): void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxAudioModule — Audio rendering / volume processing bridge
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface LynxAudioModuleSpec {
-  createVolumeProcessor(
-    pcId: number,
-    trackId: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  deleteVolumeProcessor(
-    reactTag: string,
-    pcId: number,
-    trackId: string,
-    callback: Callback,
-  ): void;
-
-  createMultibandVolumeProcessor(
-    optionsJson: string,
-    pcId: number,
-    trackId: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  deleteMultibandVolumeProcessor(
-    reactTag: string,
-    pcId: number,
-    trackId: string,
-    callback: Callback,
-  ): void;
-
-  createAudioSinkListener(
-    pcId: number,
-    trackId: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  deleteAudioSinkListener(
-    reactTag: string,
-    pcId: number,
-    trackId: string,
-    callback: Callback,
-  ): void;
-
+// ── LynxAudioModuleSpec ───────────────────────────────────────────────────────
+export interface LynxAudioModuleSpec {
+  createVolumeProcessor(pcId: number, trackId: string, callback: Callback): void;
+  deleteVolumeProcessor(processorId: string, pcId: number, trackId: string, callback: Callback): void;
+  createMultibandVolumeProcessor(optsJson: string, pcId: number, trackId: string, callback: Callback): void;
+  deleteMultibandVolumeProcessor(processorId: string, pcId: number, trackId: string, callback: Callback): void;
+  createAudioSinkListener(pcId: number, trackId: string, callback: Callback): void;
+  deleteAudioSinkListener(listenerId: string, pcId: number, trackId: string, callback: Callback): void;
   setDefaultAudioTrackVolume(volume: number, callback: Callback): void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxE2EEModule — Frame cryptors / key providers
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface LynxE2EEModuleSpec {
-  frameCryptorCreateForSender(
-    pcId: number,
-    senderId: string,
-    participantId: string,
-    algorithm: string,
-    keyProviderTag: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  frameCryptorCreateForReceiver(
-    pcId: number,
-    receiverId: string,
-    participantId: string,
-    algorithm: string,
-    keyProviderTag: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  frameCryptorSetEnabled(
-    cryptorTag: string,
-    enabled: boolean,
-    callback: Callback,
-  ): void;
-  frameCryptorSetKeyIndex(
-    cryptorTag: string,
-    keyIndex: number,
-    callback: Callback,
-  ): void;
+// ── LynxE2EEModuleSpec ────────────────────────────────────────────────────────
+export interface LynxE2EEModuleSpec {
+  frameCryptorCreateForSender(pcId: number, senderId: string, participantId: string, algorithm: string, keyProviderTag: string, callback: Callback): void;
+  frameCryptorCreateForReceiver(pcId: number, receiverId: string, participantId: string, algorithm: string, keyProviderTag: string, callback: Callback): void;
+  frameCryptorSetEnabled(cryptorTag: string, enabled: boolean, callback: Callback): void;
+  frameCryptorSetKeyIndex(cryptorTag: string, keyIndex: number, callback: Callback): void;
   frameCryptorDispose(cryptorTag: string, callback: Callback): void;
-
-  keyProviderCreate(
-    optionsJson: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  keyProviderSetSharedKey(
-    tag: string,
-    keyBase64: string,
-    keyIndex: number,
-    callback: Callback,
-  ): void;
-  keyProviderSetKey(
-    tag: string,
-    participantId: string,
-    keyBase64: string,
-    keyIndex: number,
-    callback: Callback,
-  ): void;
-  keyProviderRatchetSharedKey(
-    tag: string,
-    keyIndex: number,
-    callback: Callback,
-  ): void;
-  keyProviderRatchetKey(
-    tag: string,
-    participantId: string,
-    keyIndex: number,
-    callback: Callback,
-  ): void;
-  keyProviderSetSifTrailer(
-    tag: string,
-    trailerBase64: string,
-    callback: Callback,
-  ): void;
+  keyProviderCreate(optionsJson: string, callback: Callback): void;
+  keyProviderSetSharedKey(tag: string, keyBase64: string, keyIndex: number, callback: Callback): void;
+  keyProviderSetKey(tag: string, participantId: string, keyBase64: string, keyIndex: number, callback: Callback): void;
+  keyProviderRatchetSharedKey(tag: string, keyIndex: number, callback: Callback): void;
+  keyProviderRatchetKey(tag: string, participantId: string, keyIndex: number, callback: Callback): void;
+  keyProviderSetSifTrailer(tag: string, trailerBase64: string, callback: Callback): void;
   keyProviderDispose(tag: string, callback: Callback): void;
-
-  dataPacketCryptorCreate(
-    algorithm: string,
-    keyProviderTag: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  dataPacketCryptorEncrypt(
-    cryptorTag: string,
-    participantId: string,
-    keyIndex: number,
-    dataBase64: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
-  dataPacketCryptorDecrypt(
-    cryptorTag: string,
-    participantId: string,
-    packetJson: string,
-    callback: Callback<string | null, string | null>,
-  ): void;
+  dataPacketCryptorCreate(algorithm: string, keyProviderTag: string, callback: Callback): void;
+  dataPacketCryptorEncrypt(cryptorTag: string, participantId: string, keyIndex: number, dataBase64: string, callback: Callback): void;
+  dataPacketCryptorDecrypt(cryptorTag: string, participantId: string, packetJson: string, callback: Callback): void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LivekitLynxModule — AudioSession + livekit setup
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface LivekitLynxModuleSpec {
+// ── LivekitLynxModuleSpec ─────────────────────────────────────────────────────
+export interface LivekitLynxModuleSpec {
+  // Index signature so cast to Record<string,unknown> works
+  [key: string]: (...args: unknown[]) => void;
   configureAudio(configJson: string, callback: Callback): void;
   startAudioSession(callback: Callback): void;
   stopAudioSession(callback: Callback): void;
-  getAudioOutputs(
-    callback: Callback<string | null, string | null>,
-  ): void;
+  getAudioOutputs(callback: Callback): void;
   selectAudioOutput(deviceId: string, callback: Callback): void;
   showAudioRoutePicker(callback: Callback): void;
   setAppleAudioConfiguration(configJson: string, callback: Callback): void;
   setDefaultAudioTrackVolume(volume: number, callback: Callback): void;
 }
-
-export {};

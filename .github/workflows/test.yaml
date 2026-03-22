@@ -31,9 +31,10 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install Yarn
-        run: |
-          npm install -g yarn
-          yarn
+        run: npm install -g yarn
+
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
 
       - name: TypeScript
         run: yarn typescript

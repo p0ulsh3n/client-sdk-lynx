@@ -605,7 +605,7 @@ export class RTCPeerConnection extends EventTarget {
       pcId: this._pcId,
       channelId,
       label,
-      init,
+      ...(init !== undefined ? { init } : {}),
     });
     this._dataChannels.set(channelId, dc);
 
@@ -831,7 +831,7 @@ export class RTCPeerConnection extends EventTarget {
       receiver,
       track,
       streams,
-      transceiver: undefined,
+      transceiver: undefined as unknown as RTCRtpTransceiver,
     });
     this.dispatchEvent(ev);
     this.ontrack?.(ev);
