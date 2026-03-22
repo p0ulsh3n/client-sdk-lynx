@@ -5,6 +5,8 @@
 
 package com.livekit.lynx.internal
 
+import org.json.JSONArray
+import org.json.JSONObject
 import org.webrtc.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -29,9 +31,7 @@ object TrackRegistry {
 
 
 
-import org.json.JSONArray
-import org.json.JSONObject
-import org.webrtc.*
+
 
 class PeerConnectionObserver(
     private val pcId: Int,

@@ -185,7 +185,7 @@ open class LynxSimulcastVideoEncoderFactoryWrapper(
 // ─────────────────────────────────────────────────────────────────────────────
 
 private class WrappedVideoDecoderFactory : VideoDecoderFactory {
-    private val wrapped = org.webrtc.WrappedVideoDecoderFactory()
+    private val wrapped = DefaultVideoDecoderFactory(null)
     override fun createDecoder(info: VideoCodecInfo): VideoDecoder? = wrapped.createDecoder(info)
     override fun getSupportedCodecs(): Array<VideoCodecInfo> = wrapped.supportedCodecs
 }
