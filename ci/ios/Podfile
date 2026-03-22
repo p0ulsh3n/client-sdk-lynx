@@ -5,21 +5,30 @@ target 'ci' do
   pod 'livekit-lynx', :path => '../..'
 end
 
-# ── Fix C++ build + Xcode compat for Lynx / PrimJS pods ───────────────────
+# ── Fix C++ build + Xcode 16 compat for Lynx / PrimJS pods ─────────────────
 # 1. Lynx headers include <memory> → need C++ standard set
-# 2. Lynx .mm/.m files may have warnings treated as errors on newer Xcode
-# 3. GNU++17 for std::result_of_t compat
+# 2. Lynx .m files (e.g. LynxTextLayoutManager.m) include C++ headers
+# 3. GNU++14 avoids std::result_of_t deprecation (removed in C++20)
+# 4. Force .m files to compile as Objective-C++ for C++ header compat
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
+      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++14'
       config.build_settings['CLANG_CXX_LIBRARY']           = 'libc++'
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']   = '14.0'
       # Lynx pod has internal warnings that newer Xcode may treat as errors
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       # Suppress specific warnings in third-party pods
       config.build_settings['OTHER_CFLAGS'] ||= '$(inherited)'
-      config.build_settings['OTHER_CFLAGS']  += ' -Wno-error -Wno-shorten-64-to-32 -Wno-comma -Wno-unreachable-code'
+      config.build_settings['OTHER_CFLAGS']  += ' -Wno-error -Wno-shorten-64-to-32 -Wno-comma -Wno-unreachable-code -Wno-deprecated-declarations'
+    end
+
+    # Force Lynx pod .m files to compile as Objective-C++ so C++ headers work
+    if target.name == 'Lynx'
+      target.source_build_phase.files.each do |file|
+        next unless file.file_ref&.path&.end_with?('.m')
+        file.settings = { 'COMPILER_FLAGS' => '-x objective-c++' }
+      end
     end
   end
 end

@@ -637,10 +637,4 @@ private fun directionFromString(s: String): RtpTransceiver.RtpTransceiverDirecti
     else       -> RtpTransceiver.RtpTransceiverDirection.SEND_RECV
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxWebRTCModuleOptions — shared configuration
-// ─────────────────────────────────────────────────────────────────────────────
 
-object LynxWebRTCModuleOptions {
-    @Volatile var defaultTrackVolume: Double = 1.0
-}

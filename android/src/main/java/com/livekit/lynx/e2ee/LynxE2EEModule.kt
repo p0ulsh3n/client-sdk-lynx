@@ -255,5 +255,5 @@ class LynxE2EEModule(context: Context) : LynxModule(context) {
     // ── Helper ────────────────────────────────────────────────────────────────
 
     private fun algorithmFrom(s: String): FrameCryptorAlgorithm =
-        if (s == "AES_CBC") FrameCryptorAlgorithm.AES_CBC else FrameCryptorAlgorithm.AES_GCM
+        FrameCryptorAlgorithm.AES_GCM  // WebRTC 137+ only supports AES_GCM
 }
