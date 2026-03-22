@@ -6,20 +6,20 @@ target 'ci' do
 end
 
 # ── Fix C++ build + Xcode 16 compat for Lynx / PrimJS pods ─────────────────
-# Problem:
-#   - Lynx .cc files (worklet_utils.cc etc.) need C++17 features
-#   - Lynx .m files may use deprecated APIs → suppress warnings
-#   - std::result_of_t is deprecated in C++17 → must not be treated as error
+# lynx.h includes <memory> (C++ stdlib) — Swift can't find it without the
+# C++ stdlib include path. This is lynx-family/primjs Issue #55.
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
       config.build_settings['CLANG_CXX_LIBRARY']           = 'libc++'
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']   = '14.0'
+      # Add C++ stdlib include path so <memory>, <string>, etc. are found
+      config.build_settings['HEADER_SEARCH_PATHS'] = '$(inherited) $(SDKROOT)/usr/include/c++/v1'
       # Never treat warnings as errors in third-party pods
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
-      # Suppress deprecation + other warnings, remove error limit
+      # Suppress all warnings in third-party pods
       config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
       config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
     end
