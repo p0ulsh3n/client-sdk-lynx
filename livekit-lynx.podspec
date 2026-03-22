@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   # Swift/Objective-C compatibility + C++ flags for Lynx/PrimJS headers
   s.pod_target_xcconfig = {
     'DEFINES_MODULE'               => 'YES',
-    'CLANG_CXX_LANGUAGE_STANDARD'  => 'gnu++14',
+    'CLANG_CXX_LANGUAGE_STANDARD'  => 'gnu++17',
     'CLANG_CXX_LIBRARY'            => 'libc++',
     'HEADER_SEARCH_PATHS'          => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)'
   }
