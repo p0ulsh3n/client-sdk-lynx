@@ -68,7 +68,7 @@ public final class LynxE2EEModule: NSObject {
                 }
                 let algo = rtcAlgorithm(from: algorithm)
                 let cryptor = RTCFrameCryptor(
-                    factory: nil,
+                    factory: PCManager.shared.peerConnectionFactory,
                     rtpSender: sender,
                     participantId: participantId,
                     algorithm: algo,
@@ -106,7 +106,7 @@ public final class LynxE2EEModule: NSObject {
                 }
                 let algo = rtcAlgorithm(from: algorithm)
                 let cryptor = RTCFrameCryptor(
-                    factory: nil,
+                    factory: PCManager.shared.peerConnectionFactory,
                     rtpReceiver: receiver,
                     participantId: participantId,
                     algorithm: algo,
@@ -257,7 +257,7 @@ public final class LynxE2EEModule: NSObject {
             callback("KeyProvider not found: \(tag)", nil)
             return
         }
-        kp.ratchetKey(participantId, withIndex: Int32(keyIndex))
+        let newKey = kp.ratchetKey(participantId, with: Int32(keyIndex))
         callback(nil, nil)
     }
 
@@ -382,7 +382,9 @@ public final class LynxE2EEModule: NSObject {
     // MARK: - Helpers
 
     private func rtcAlgorithm(from string: String) -> RTCCryptorAlgorithm {
-        string == "AES-CBC" ? .aesCbc : .aesGcm
+        // Note: AES-CBC is commented out / not available in WebRTC-SDK 144.
+        // Only AES-GCM is supported.
+        return .aesGcm
     }
 }
 

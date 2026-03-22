@@ -123,8 +123,11 @@ jobs:
             clean build 2>&1 | tee /tmp/xcodebuild.log | grep -E '(error:|warning:|BUILD FAILED|BUILD SUCCEEDED|\*\*)' || true
           echo "---"
           echo "Exit code: ${PIPESTATUS[0]}"
+          ERRORS=$(grep -c "error:" /tmp/xcodebuild.log || true)
+          WARNINGS=$(grep -c "warning:" /tmp/xcodebuild.log || true)
+          echo "Total errors: $ERRORS | Total warnings: $WARNINGS"
           if grep -q "BUILD FAILED" /tmp/xcodebuild.log; then
-            echo "=== ERRORS ==="
-            grep -A2 "error:" /tmp/xcodebuild.log | head -100
+            echo "=== ALL ERRORS ==="
+            grep -A2 "error:" /tmp/xcodebuild.log
             exit 1
           fi

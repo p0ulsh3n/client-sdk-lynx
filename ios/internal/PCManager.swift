@@ -38,7 +38,7 @@ actor PCManager {
 
     // MARK: - Factory access
 
-    nonisolated(unsafe) var peerConnectionFactory: RTCPeerConnectionFactory { factory }
+    nonisolated var peerConnectionFactory: RTCPeerConnectionFactory { factory }
 
     // MARK: - CRUD
 
