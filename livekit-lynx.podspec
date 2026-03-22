@@ -1,30 +1,30 @@
-require 'json'
+require "json"
 
-package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
+package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name          = 'livekit-lynx'
-  s.version       = package['version']
-  s.summary       = package['description']
-  s.homepage      = 'https://github.com/p0ulsh3n/client-sdk-lynx'
-  s.license       = { :type => 'Apache-2.0', :file => 'LICENSE' }
-  s.authors       = 'LiveKit contributors'
+  s.name         = "livekit-lynx"
+  s.version      = package["version"]
+  s.summary      = package["description"]
+  s.homepage     = package["homepage"]
+  s.license      = package["license"]
+  s.authors      = package["author"]
 
-  s.platforms     = { ios: '14.0' }
-  s.source        = {
-    git: 'https://github.com/p0ulsh3n/client-sdk-lynx.git',
-    tag: "v#{s.version}"
-  }
+  s.platforms    = { :ios => "14.0" }
+  s.source       = { :git => "https://github.com/livekit/client-sdk-lynx.git", :tag => "#{s.version}" }
 
-  s.source_files        = 'ios/**/*.{h,m,mm,swift}'
-  s.public_header_files = 'ios/**/*.h'
+  s.source_files        = "ios/**/*.{h,m,mm,swift}"
+  s.public_header_files = "ios/**/*.h"
 
-  # Swift 5.0 (compatible avec tous les runners GitHub 2026 + Lynx officiel)
-  s.swift_version = '5.0'
+  # Same as livekit-react-native.podspec
+  s.framework = "AVFAudio"
 
-  s.framework = 'AVFAudio'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  # Swift/Objective-C compatibility — same as both SDKs
+  s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
 
-  s.dependency 'Lynx'
-  s.dependency 'WebRTC-SDK', '~> 125.0'
+  # Lynx SDK — provided by the host app
+  s.dependency "Lynx"
+
+  # Google WebRTC — same version as Flutter SDK (newest stable)
+  s.dependency "WebRTC-SDK", "144.7559.01"
 end

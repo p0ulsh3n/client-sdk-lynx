@@ -1,0 +1,19 @@
+{
+  "name": "ci",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "postinstall": "install-local ../"
+  },
+  "dependencies": {
+    "@livekit/lynx": "*",
+    "livekit-client": "^2.15.0"
+  },
+  "devDependencies": {
+    "install-local": "^3.0.1",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "@livekit/lynx",
   "version": "1.0.0",
   "description": "LiveKit real-time video, audio and data for Lynx (ReactLynx)",
@@ -34,7 +33,9 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "pods": "cd example && pod install --project-directory=ios",
-    "bootstrap": "yarn example && yarn && yarn pods"
+    "bootstrap": "yarn example && yarn && yarn pods",
+    "typescript": "tsc --noemit -p tsconfig.build.json",
+    "ci": "cd ci && yarn"
   },
   "keywords": [
     "livekit",
@@ -50,12 +51,12 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/p0ulsh3n/client-sdk-lynx.git"
+    "url": "https://github.com/livekit/client-sdk-lynx.git"
   },
   "bugs": {
-    "url": "https://github.com/p0ulsh3n/client-sdk-lynx/issues"
+    "url": "https://github.com/livekit/client-sdk-lynx/issues"
   },
-  "homepage": "https://github.com/p0ulsh3n/client-sdk-lynx",
+  "homepage": "https://github.com/livekit/client-sdk-lynx",
   "dependencies": {
     "@livekit/components-react": "^2.9.0",
     "@livekit/components-core": "^0.12.0",
@@ -69,9 +70,12 @@
     "base64-js": "^1.5.1"
   },
   "peerDependencies": {
+    "@lynx-js/react": ">=0.1.0",
     "livekit-client": "^2.15.0"
   },
   "devDependencies": {
+    "@lynx-js/react": "^0.1.0",
+    "@lynx-js/types": "^0.1.0",
     "livekit-client": "^2.15.0",
     "typescript": "^5.5.0",
     "eslint": "^9.0.0",
