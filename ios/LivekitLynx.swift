@@ -17,7 +17,7 @@ import WebRTC
 
 @objc public final class LivekitLynx: NSObject {
 
-    private init() {}
+    private override init() { super.init() }
 
     /**
      * Configures the WebRTC video encoder factory with simulcast support

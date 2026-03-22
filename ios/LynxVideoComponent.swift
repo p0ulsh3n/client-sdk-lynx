@@ -32,25 +32,13 @@ public final class LynxVideoShadowNode: LynxShadowNode {}
 
 // MARK: - LynxVideoComponentUI (Swift logic, Lynx wiring via Obj-C companion)
 
+/// LynxUI requires its generic parameter to be a UIView subclass.
+/// We use RTCMTLVideoView directly as the view type.
 @objc(LynxVideoComponentUI)
-public final class LynxVideoComponentUI: LynxUI<LynxVideoShadowNode> {
-
-    // Metal renderer (preferred, falls back to EAGL on unsupported devices)
-    private lazy var videoView: RTCMTLVideoView = {
-        let v = RTCMTLVideoView(frame: .zero)
-        v.videoContentMode = .scaleAspectFill
-        return v
-    }()
+public final class LynxVideoComponentUI: LynxUI<RTCMTLVideoView> {
 
     private var currentTrack: RTCVideoTrack?
     private var streamURL: String?
-
-    // MARK: - LynxUI
-
-    public override func createView() -> UIView {
-        videoView.backgroundColor = .black
-        return videoView
-    }
 
     // MARK: - Prop setters (called by LYNX_PROP_SETTER macros in .m companion)
 
@@ -59,42 +47,41 @@ public final class LynxVideoComponentUI: LynxUI<LynxVideoShadowNode> {
         guard urlString != streamURL else { return }
         streamURL = urlString
 
-        currentTrack?.remove(videoView)
+        if let view = self.view() as? RTCMTLVideoView {
+            currentTrack?.remove(view)
+        }
         currentTrack = nil
 
         let streamId = urlString.replacingOccurrences(of: "livekit-stream://", with: "")
         Task { @MainActor in
             guard let track = await self.findVideoTrack(forStreamId: streamId) else { return }
             self.currentTrack = track
-            track.add(self.videoView)
+            if let view = self.view() as? RTCMTLVideoView {
+                track.add(view)
+            }
         }
     }
 
     /// "cover" (default) → scaleAspectFill  |  "contain" → scaleAspectFit
     @objc public func setObjectFit(_ fit: String) {
-        videoView.videoContentMode = fit == "contain"
+        guard let view = self.view() as? RTCMTLVideoView else { return }
+        view.videoContentMode = fit == "contain"
             ? .scaleAspectFit
             : .scaleAspectFill
     }
 
     /// Mirror horizontally (front-facing camera self-view).
     @objc public func setMirror(_ mirror: Bool) {
-        videoView.transform = mirror
+        guard let view = self.view() else { return }
+        view.transform = mirror
             ? CGAffineTransform(scaleX: -1, y: 1)
             : .identity
     }
 
     /// Z-stacking within the Lynx view hierarchy.
     @objc public func setZOrder(_ z: NSNumber) {
-        videoView.layer.zPosition = CGFloat(z.floatValue)
-    }
-
-    // MARK: - Lifecycle
-
-    public override func onDetached() {
-        super.onDetached()
-        currentTrack?.remove(videoView)
-        currentTrack = nil
+        guard let view = self.view() else { return }
+        view.layer.zPosition = CGFloat(z.floatValue)
     }
 
     // MARK: - Private
@@ -102,5 +89,12 @@ public final class LynxVideoComponentUI: LynxUI<LynxVideoShadowNode> {
     private func findVideoTrack(forStreamId id: String) async -> RTCVideoTrack? {
         guard let stream = await TrackRegistry.shared.getStream(id) else { return nil }
         return stream.videoTracks.first
+    }
+
+    deinit {
+        if let view = self.view() as? RTCMTLVideoView {
+            currentTrack?.remove(view)
+        }
+        currentTrack = nil
     }
 }

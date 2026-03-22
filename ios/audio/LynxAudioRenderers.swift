@@ -34,7 +34,7 @@ public class BaseVolumeAudioRenderer: NSObject, RTCAudioRenderer {
         frameInterval = Int((intervalMs / 10.0).rounded())
     }
 
-    public func renderPCMBuffer(_ pcmBuffer: AVAudioPCMBuffer) {
+    public func render(pcmBuffer: AVAudioPCMBuffer) {
         if skippedFrames < frameInterval - 1 {
             skippedFrames += 1
             return
@@ -107,7 +107,7 @@ public class BaseMultibandVolumeAudioRenderer: NSObject, RTCAudioRenderer {
         )
     }
 
-    public func renderPCMBuffer(_ pcmBuffer: AVAudioPCMBuffer) {
+    public func render(pcmBuffer: AVAudioPCMBuffer) {
         if skippedFrames < frameInterval - 1 {
             skippedFrames += 1
             return
@@ -166,7 +166,7 @@ public final class LynxMultibandVolumeAudioRenderer: BaseMultibandVolumeAudioRen
 /// Base class for raw PCM audio sink (delivers raw audio frames to JS).
 public class BaseAudioSinkRenderer: NSObject, RTCAudioRenderer {
 
-    public func renderPCMBuffer(_ pcmBuffer: AVAudioPCMBuffer) {
+    public func render(pcmBuffer: AVAudioPCMBuffer) {
         onData(pcmBuffer)
     }
 
