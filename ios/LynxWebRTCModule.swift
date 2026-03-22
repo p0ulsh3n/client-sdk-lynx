@@ -402,7 +402,7 @@ public final class LynxWebRTCModule: NSObject {
                 let receiversJson = pc.receivers.map { r -> [String: Any] in
                     [
                         "receiverId": r.receiverId,
-                        "trackId": r.track.trackId,
+                        "trackId": r.track?.trackId as Any,
                         "kind": (r.track as? RTCAudioTrack) != nil ? "audio" : "video",
                         "streamIds": [],
                     ]
@@ -422,10 +422,12 @@ public final class LynxWebRTCModule: NSObject {
             do {
                 let pc = try await PCManager.shared.get(Int(pcId))
                 let transJson = pc.transceivers.map { t -> [String: Any] in
-                    [
-                        "transceiverId": t.transceiverId,
+                    var curDir: RTCRtpTransceiverDirection = .inactive
+                    let hasCurDir = t.currentDirection(&curDir)
+                    return [
+                        "transceiverId": t.mid ?? UUID().uuidString,
                         "direction": t.direction.stringValue,
-                        "currentDirection": t.currentDirection?.stringValue as Any,
+                        "currentDirection": hasCurDir ? curDir.stringValue : NSNull(),
                         "stopped": t.isStopped,
                         "mid": t.mid as Any,
                         "sender": [
@@ -436,7 +438,7 @@ public final class LynxWebRTCModule: NSObject {
                         ],
                         "receiver": [
                             "receiverId": t.receiver.receiverId,
-                            "trackId": t.receiver.track.trackId,
+                            "trackId": t.receiver.track?.trackId as Any,
                             "kind": (t.receiver.track as? RTCAudioTrack) != nil ? "audio" : "video",
                             "streamIds": [],
                         ],
@@ -765,8 +767,8 @@ public final class LynxWebRTCModule: NSObject {
         Task {
             do {
                 let pc = try await PCManager.shared.get(Int(pcId))
-                if let t = pc.transceivers.first(where: { $0.transceiverId == transceiverId }) {
-                    t.direction = RTCRtpTransceiverDirection.from(string: direction)
+                if let t = pc.transceivers.first(where: { $0.mid == transceiverId }) {
+                    t.setDirection(RTCRtpTransceiverDirection.from(string: direction), error: nil)
                 }
                 callback(nil, nil)
             } catch {
@@ -784,7 +786,7 @@ public final class LynxWebRTCModule: NSObject {
             do {
                 let pc = try await PCManager.shared.get(Int(pcId))
                 pc.transceivers
-                    .first { $0.transceiverId == transceiverId }?
+                    .first(where: { $0.mid == transceiverId })?
                     .stopInternal()
                 callback(nil, nil)
             } catch {

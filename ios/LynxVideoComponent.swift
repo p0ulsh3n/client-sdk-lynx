@@ -47,41 +47,39 @@ public final class LynxVideoComponentUI: LynxUI<RTCMTLVideoView> {
         guard urlString != streamURL else { return }
         streamURL = urlString
 
-        if let view = self.view() as? RTCMTLVideoView {
-            currentTrack?.remove(view)
-        }
+        let videoView: RTCMTLVideoView = self.view()
+        currentTrack?.remove(videoView)
         currentTrack = nil
 
         let streamId = urlString.replacingOccurrences(of: "livekit-stream://", with: "")
         Task { @MainActor in
             guard let track = await self.findVideoTrack(forStreamId: streamId) else { return }
             self.currentTrack = track
-            if let view = self.view() as? RTCMTLVideoView {
-                track.add(view)
-            }
+            let v: RTCMTLVideoView = self.view()
+            track.add(v)
         }
     }
 
     /// "cover" (default) → scaleAspectFill  |  "contain" → scaleAspectFit
     @objc public func setObjectFit(_ fit: String) {
-        guard let view = self.view() as? RTCMTLVideoView else { return }
-        view.videoContentMode = fit == "contain"
+        let videoView: RTCMTLVideoView = self.view()
+        videoView.videoContentMode = fit == "contain"
             ? .scaleAspectFit
             : .scaleAspectFill
     }
 
     /// Mirror horizontally (front-facing camera self-view).
     @objc public func setMirror(_ mirror: Bool) {
-        guard let view = self.view() else { return }
-        view.transform = mirror
+        let v: RTCMTLVideoView = self.view()
+        v.transform = mirror
             ? CGAffineTransform(scaleX: -1, y: 1)
             : .identity
     }
 
     /// Z-stacking within the Lynx view hierarchy.
     @objc public func setZOrder(_ z: NSNumber) {
-        guard let view = self.view() else { return }
-        view.layer.zPosition = CGFloat(z.floatValue)
+        let v: RTCMTLVideoView = self.view()
+        v.layer.zPosition = CGFloat(z.floatValue)
     }
 
     // MARK: - Private
@@ -92,9 +90,8 @@ public final class LynxVideoComponentUI: LynxUI<RTCMTLVideoView> {
     }
 
     deinit {
-        if let view = self.view() as? RTCMTLVideoView {
-            currentTrack?.remove(view)
-        }
+        let videoView: RTCMTLVideoView = self.view()
+        currentTrack?.remove(videoView)
         currentTrack = nil
     }
 }
