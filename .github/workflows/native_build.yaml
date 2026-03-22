@@ -110,6 +110,7 @@ jobs:
       - name: Compile iOS
         working-directory: ./ci/ios/
         run: |
+          set -o pipefail
           xcodebuild -workspace ci.xcworkspace/ \
             -scheme ci \
             -destination generic/platform=iOS \
@@ -119,4 +120,11 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGNING_ALLOWED="NO" \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            clean build 2>&1 | tail -200
+            clean build 2>&1 | tee /tmp/xcodebuild.log | grep -E '(error:|warning:|BUILD FAILED|BUILD SUCCEEDED|\*\*)' || true
+          echo "---"
+          echo "Exit code: ${PIPESTATUS[0]}"
+          if grep -q "BUILD FAILED" /tmp/xcodebuild.log; then
+            echo "=== ERRORS ==="
+            grep -A2 "error:" /tmp/xcodebuild.log | head -100
+            exit 1
+          fi
