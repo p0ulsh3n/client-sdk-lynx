@@ -10,8 +10,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 #import <Lynx/Lynx.h>
-// Import the Swift-generated header for the module
-#import "livekit_lynx-Swift.h"
+// Import the Swift-generated header for the module (framework target)
+#import <livekit_lynx/livekit_lynx-Swift.h>
 
 // Register the Custom Native Component with Lynx.
 // The tag "livekit-webrtc-view" must match exactly what is used in JSX.
