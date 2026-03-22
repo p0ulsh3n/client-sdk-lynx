@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 import org.webrtc.FrameCryptor
 import org.webrtc.FrameCryptorAlgorithm
@@ -54,7 +53,7 @@ class LynxE2EEModule(context: Context) : LynxModule(context) {
                     ?: throw IllegalArgumentException("KeyProvider $keyProviderTag not found")
                 val algo = algorithmFrom(algorithm)
                 val cryptor = FrameCryptorFactory.createFrameCryptorForRtpSender(
-                    participantId, sender, algo, kp
+                    PCManager.factory, sender, participantId, algo, kp
                 )
                 val tag = UUID.randomUUID().toString()
                 cryptors[tag] = cryptor
@@ -85,7 +84,7 @@ class LynxE2EEModule(context: Context) : LynxModule(context) {
                     ?: throw IllegalArgumentException("KeyProvider $keyProviderTag not found")
                 val algo = algorithmFrom(algorithm)
                 val cryptor = FrameCryptorFactory.createFrameCryptorForRtpReceiver(
-                    participantId, receiver, algo, kp
+                    PCManager.factory, receiver, participantId, algo, kp
                 )
                 val tag = UUID.randomUUID().toString()
                 cryptors[tag] = cryptor
@@ -142,14 +141,14 @@ class LynxE2EEModule(context: Context) : LynxModule(context) {
             val magicBytes: ByteArray? = opts.optString("uncryptedMagicBytes").takeIf { it.isNotEmpty() }
                 ?.let { Base64.decode(it, Base64.NO_WRAP) }
 
-            val kp = FrameCryptorFactory.createDefaultKeyProvider(
+            val kp = FrameCryptorFactory.createFrameCryptorKeyProvider(
+                sharedKey,
                 ratchetSalt,
                 ratchetWindow,
-                sharedKey,
+                magicBytes ?: ByteArray(0),
                 failureTol,
                 keyRingSize,
                 discardWhenUnready,
-                magicBytes,
             )
             val tag = UUID.randomUUID().toString()
             keyProviders[tag] = kp
@@ -256,5 +255,5 @@ class LynxE2EEModule(context: Context) : LynxModule(context) {
     // ── Helper ────────────────────────────────────────────────────────────────
 
     private fun algorithmFrom(s: String): FrameCryptorAlgorithm =
-        if (s == "AES-CBC") FrameCryptorAlgorithm.AES_CBC else FrameCryptorAlgorithm.AES_GCM
+        if (s == "AES_CBC") FrameCryptorAlgorithm.AES_CBC else FrameCryptorAlgorithm.AES_GCM
 }

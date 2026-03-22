@@ -14,9 +14,16 @@ import android.hardware.camera2.CameraManager
 import com.livekit.lynx.internal.PCManager
 import com.livekit.lynx.internal.PeerConnectionObserver
 import com.livekit.lynx.internal.TrackRegistry
+import com.livekit.lynx.internal.createOfferSuspend
+import com.livekit.lynx.internal.createAnswerSuspend
+import com.livekit.lynx.internal.setLocalDescriptionSuspend
+import com.livekit.lynx.internal.setRemoteDescriptionSuspend
+import com.livekit.lynx.internal.addIceCandidateSuspend
+import com.livekit.lynx.internal.getStatsSuspend
 import com.lynx.jsbridge.LynxMethod
 import com.lynx.jsbridge.LynxModule
 import com.lynx.react.bridge.Callback
+import com.lynx.react.bridge.JavaOnlyArray
 import com.lynx.tasm.behavior.LynxContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +49,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
             try {
                 val config = PCManager.parseConfiguration(configJson)
                 val observer = PeerConnectionObserver(pcId.toInt()) { event ->
-                    lynxCtx.sendGlobalEvent("LK_PC_EVENT", event)
+                    lynxCtx.sendGlobalEvent("LK_PC_EVENT", JavaOnlyArray().apply { pushString(event) })
                 }
                 PCManager.create(pcId.toInt(), config, observer)
                 callback.invoke(null, "ok")
@@ -72,7 +79,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
             try {
                 val pc = PCManager.get(pcId.toInt())
                 val sdp = pc.createOfferSuspend(MediaConstraints())
-                callback.invoke(null, sdp.toJSON())
+                callback.invoke(null, sdpToJSON(sdp))
             } catch (e: Exception) {
                 callback.invoke(e.message, null)
             }
@@ -85,7 +92,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
             try {
                 val pc = PCManager.get(pcId.toInt())
                 val sdp = pc.createAnswerSuspend(MediaConstraints())
-                callback.invoke(null, sdp.toJSON())
+                callback.invoke(null, sdpToJSON(sdp))
             } catch (e: Exception) {
                 callback.invoke(e.message, null)
             }
@@ -97,7 +104,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
         scope.launch {
             try {
                 val pc = PCManager.get(pcId.toInt())
-                val sdp = SessionDescription.fromJSON(sdpJson)
+                val sdp = sdpFromJSON(sdpJson)
                 pc.setLocalDescriptionSuspend(sdp)
                 callback.invoke(null, null)
             } catch (e: Exception) {
@@ -111,7 +118,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
         scope.launch {
             try {
                 val pc = PCManager.get(pcId.toInt())
-                val sdp = SessionDescription.fromJSON(sdpJson)
+                val sdp = sdpFromJSON(sdpJson)
                 pc.setRemoteDescriptionSuspend(sdp)
                 callback.invoke(null, null)
             } catch (e: Exception) {
@@ -127,7 +134,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
         scope.launch {
             try {
                 val pc = PCManager.get(pcId.toInt())
-                val candidate = IceCandidate.fromJSON(candidateJson)
+                val candidate = iceCandidateFromJSON(candidateJson)
                 pc.addIceCandidateSuspend(candidate)
                 callback.invoke(null, null)
             } catch (e: Exception) {
@@ -229,8 +236,8 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
                 pc.transceivers.forEach { t ->
                     arr.put(JSONObject().apply {
                         put("transceiverId", t.mid ?: UUID.randomUUID().toString())
-                        put("direction", t.direction.toStringValue())
-                        put("currentDirection", t.currentDirection?.toStringValue())
+                        put("direction", directionToString(t.direction))
+                        put("currentDirection", t.currentDirection?.let { directionToString(it) })
                         put("stopped", t.isStopped)
                         put("mid", t.mid)
                         put("sender", JSONObject().apply {
@@ -268,7 +275,9 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
                         put("id", stat.id)
                         put("type", stat.type)
                         put("timestamp", stat.timestampUs)
-                        stat.members.forEach { (k, v) -> put(k, v) }
+                        stat.members.forEach { entry ->
+                            put(entry.key, entry.value)
+                        }
                     }
                     arr.put(obj)
                 }
@@ -290,7 +299,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
                 val dc = pc.createDataChannel(label, config)
                     ?: throw IllegalStateException("createDataChannel returned null")
                 dc.registerObserver(LynxDataChannelObserver(pcId.toInt(), dc.id()) { event ->
-                    lynxCtx.sendGlobalEvent("LK_PC_EVENT", event)
+                    lynxCtx.sendGlobalEvent("LK_PC_EVENT", JavaOnlyArray().apply { pushString(event) })
                 })
                 callback.invoke(null, dc.id().toString())
             } catch (e: Exception) {
@@ -514,7 +523,7 @@ class LynxWebRTCModule(context: Context) : LynxModule(context) {
                 val pc = PCManager.get(pcId.toInt())
                 pc.transceivers
                     .firstOrNull { it.mid == transceiverId }
-                    ?.direction = RtpTransceiver.RtpTransceiverDirection.fromString(direction)
+                    ?.direction = directionFromString(direction)
                 callback.invoke(null, null)
             } catch (e: Exception) {
                 callback.invoke(e.message, null)
@@ -572,16 +581,16 @@ class LynxDataChannelObserver(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Extension helpers
+// Standalone helper functions (WebRTC classes don't have Companion objects)
 // ─────────────────────────────────────────────────────────────────────────────
 
-private fun SessionDescription.toJSON(): String =
+private fun sdpToJSON(sdp: SessionDescription): String =
     JSONObject().apply {
-        put("type", type.canonicalForm())
-        put("sdp", description)
+        put("type", sdp.type.canonicalForm())
+        put("sdp", sdp.description)
     }.toString()
 
-private fun SessionDescription.Companion.fromJSON(json: String): SessionDescription {
+private fun sdpFromJSON(json: String): SessionDescription {
     val obj = JSONObject(json)
     val type = when (obj.getString("type")) {
         "offer"    -> SessionDescription.Type.OFFER
@@ -592,7 +601,7 @@ private fun SessionDescription.Companion.fromJSON(json: String): SessionDescript
     return SessionDescription(type, obj.getString("sdp"))
 }
 
-private fun IceCandidate.Companion.fromJSON(json: String): IceCandidate {
+private fun iceCandidateFromJSON(json: String): IceCandidate {
     val obj = JSONObject(json)
     return IceCandidate(
         obj.optString("sdpMid"),
@@ -612,7 +621,7 @@ private fun DataChannel.Init.applyJSON(json: String): DataChannel.Init {
     return this
 }
 
-private fun RtpTransceiver.RtpTransceiverDirection.toStringValue(): String = when (this) {
+private fun directionToString(dir: RtpTransceiver.RtpTransceiverDirection): String = when (dir) {
     RtpTransceiver.RtpTransceiverDirection.SEND_RECV -> "sendrecv"
     RtpTransceiver.RtpTransceiverDirection.SEND_ONLY -> "sendonly"
     RtpTransceiver.RtpTransceiverDirection.RECV_ONLY -> "recvonly"
@@ -620,10 +629,18 @@ private fun RtpTransceiver.RtpTransceiverDirection.toStringValue(): String = whe
     RtpTransceiver.RtpTransceiverDirection.STOPPED   -> "stopped"
 }
 
-private fun RtpTransceiver.RtpTransceiverDirection.Companion.fromString(s: String) = when (s) {
+private fun directionFromString(s: String): RtpTransceiver.RtpTransceiverDirection = when (s) {
     "sendrecv" -> RtpTransceiver.RtpTransceiverDirection.SEND_RECV
     "sendonly" -> RtpTransceiver.RtpTransceiverDirection.SEND_ONLY
     "recvonly" -> RtpTransceiver.RtpTransceiverDirection.RECV_ONLY
     "inactive" -> RtpTransceiver.RtpTransceiverDirection.INACTIVE
     else       -> RtpTransceiver.RtpTransceiverDirection.SEND_RECV
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LynxWebRTCModuleOptions — shared configuration
+// ─────────────────────────────────────────────────────────────────────────────
+
+object LynxWebRTCModuleOptions {
+    @Volatile var defaultTrackVolume: Double = 1.0
 }

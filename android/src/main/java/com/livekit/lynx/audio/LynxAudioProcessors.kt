@@ -6,6 +6,7 @@
 
 package com.livekit.lynx.audio
 
+import com.livekit.lynx.audio.fft.AudioFormat
 import com.livekit.lynx.audio.fft.FFTAudioAnalyzer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

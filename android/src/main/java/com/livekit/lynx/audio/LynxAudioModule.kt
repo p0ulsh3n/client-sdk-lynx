@@ -11,12 +11,11 @@ import com.livekit.lynx.internal.TrackRegistry
 import com.lynx.jsbridge.LynxMethod
 import com.lynx.jsbridge.LynxModule
 import com.lynx.react.bridge.Callback
+import com.lynx.react.bridge.JavaOnlyArray
 import com.lynx.tasm.behavior.LynxContext
 import org.json.JSONObject
 import org.webrtc.AudioTrack
 import org.webrtc.AudioTrackSink
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val LOCAL_PC_ID = -1
@@ -31,10 +30,12 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
         val processor = LynxVolumeProcessor { volume, tag ->
             lynxCtx.sendGlobalEvent(
                 "LK_VOLUME_PROCESSED",
-                JSONObject().apply { put("volume", volume); put("id", tag) }.toString()
+                JavaOnlyArray().apply {
+                    pushString(JSONObject().apply { put("volume", volume); put("id", tag) }.toString())
+                }
             )
         }
-        val tag = sinkManager.register(processor)
+        val tag = sinkManager.registerSink(processor)
         processor.reactTag = tag
         attachSink(processor, pcId.toInt(), trackId)
         callback.invoke(null, tag)
@@ -43,7 +44,7 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
     @LynxMethod
     fun deleteVolumeProcessor(reactTag: String, pcId: Double, trackId: String, callback: Callback) {
         detachSink(reactTag, pcId.toInt(), trackId)
-        sinkManager.unregister(reactTag)
+        sinkManager.unregisterSink(reactTag)
         callback.invoke(null, null)
     }
 
@@ -63,13 +64,15 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
         ) { magnitudes, tag ->
             lynxCtx.sendGlobalEvent(
                 "LK_MULTIBAND_PROCESSED",
-                JSONObject().apply {
-                    put("magnitudes", magnitudes.toList())
-                    put("id", tag)
-                }.toString()
+                JavaOnlyArray().apply {
+                    pushString(JSONObject().apply {
+                        put("magnitudes", magnitudes.toList())
+                        put("id", tag)
+                    }.toString())
+                }
             )
         }
-        val tag = sinkManager.register(processor)
+        val tag = sinkManager.registerSink(processor)
         processor.reactTag = tag
         attachSink(processor, pcId.toInt(), trackId)
         processor.start()
@@ -80,7 +83,7 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
     fun deleteMultibandVolumeProcessor(reactTag: String, pcId: Double, trackId: String, callback: Callback) {
         val sink = sinkManager.getSink(reactTag)
         detachSinkObject(sink, pcId.toInt(), trackId)
-        sinkManager.unregister(reactTag)
+        sinkManager.unregisterSink(reactTag)
         (sink as? LynxMultibandVolumeProcessor)?.release()
         callback.invoke(null, null)
     }
@@ -90,10 +93,12 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
         val processor = LynxAudioSinkProcessor { data, tag ->
             lynxCtx.sendGlobalEvent(
                 "LK_AUDIO_DATA",
-                JSONObject().apply { put("data", data); put("id", tag) }.toString()
+                JavaOnlyArray().apply {
+                    pushString(JSONObject().apply { put("data", data); put("id", tag) }.toString())
+                }
             )
         }
-        val tag = sinkManager.register(processor)
+        val tag = sinkManager.registerSink(processor)
         processor.reactTag = tag
         attachSink(processor, pcId.toInt(), trackId)
         callback.invoke(null, tag)
@@ -102,7 +107,7 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
     @LynxMethod
     fun deleteAudioSinkListener(reactTag: String, pcId: Double, trackId: String, callback: Callback) {
         detachSink(reactTag, pcId.toInt(), trackId)
-        sinkManager.unregister(reactTag)
+        sinkManager.unregisterSink(reactTag)
         callback.invoke(null, null)
     }
 
@@ -137,23 +142,6 @@ class LynxAudioModule(context: Context) : LynxModule(context) {
             (TrackRegistry.getAudioTrack(pcId, trackId) as? AudioTrack)?.removeSink(sink)
         }
     }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxAudioSinkManager — thread-safe registry
-// ─────────────────────────────────────────────────────────────────────────────
-
-class LynxAudioSinkManager {
-    private val sinks = ConcurrentHashMap<String, AudioTrackSink>()
-
-    fun register(sink: AudioTrackSink): String {
-        val tag = UUID.randomUUID().toString()
-        sinks[tag] = sink
-        return tag
-    }
-
-    fun unregister(tag: String) { sinks.remove(tag) }
-    fun getSink(tag: String): AudioTrackSink? = sinks[tag]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -6,8 +6,6 @@
 
 package com.livekit.lynx.audio.fft
 
-import android.media.AudioTrack
-import com.livekit.lynx.audio.AudioFormat
 import com.paramsen.noise.Noise
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +14,15 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
+
+/**
+ * Audio format descriptor for PCM audio data.
+ */
+data class AudioFormat(
+    val bitsPerSample: Int,
+    val sampleRate: Int,
+    val numberOfChannels: Int,
+)
 
 /**
  * A Fast Fourier Transform analyser for raw PCM audio bytes.
@@ -126,12 +133,12 @@ class FFTAudioAnalyzer {
 
     private fun getDefaultBufferSizeInBytes(audioFormat: AudioFormat): Int {
         val outputPcmFrameSize = getPcmFrameSize(audioFormat.numberOfChannels)
-        val minBuffer = AudioTrack.getMinBufferSize(
+        val minBuffer = android.media.AudioTrack.getMinBufferSize(
             audioFormat.sampleRate,
             getAudioTrackChannelConfig(audioFormat.numberOfChannels),
             android.media.AudioFormat.ENCODING_PCM_16BIT,
         )
-        check(minBuffer != AudioTrack.ERROR_BAD_VALUE)
+        check(minBuffer != android.media.AudioTrack.ERROR_BAD_VALUE)
         val multiplied = minBuffer * 4
         val minApp = durationUsToFrames(audioFormat.sampleRate, 30 * 1000).toInt() * outputPcmFrameSize
         val maxApp = max(
@@ -142,7 +149,3 @@ class FFTAudioAnalyzer {
         return frames * outputPcmFrameSize
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AudioFormat data class
-// ─────────────────────────────────────────────────────────────────────────────

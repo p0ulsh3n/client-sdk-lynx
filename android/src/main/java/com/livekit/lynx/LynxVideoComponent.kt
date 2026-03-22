@@ -26,7 +26,7 @@ class LynxVideoComponent(context: LynxContext) : LynxUI<FrameLayout>(context) {
     private val eglBase: EglBase by lazy { EglBase.create() }
 
     private val renderer: SurfaceViewRenderer by lazy {
-        SurfaceViewRenderer(context.context).also { r ->
+        SurfaceViewRenderer(mContext.context).also { r ->
             r.layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -36,7 +36,7 @@ class LynxVideoComponent(context: LynxContext) : LynxUI<FrameLayout>(context) {
     }
 
     private val container: FrameLayout by lazy {
-        FrameLayout(context.context).also { it.addView(renderer) }
+        FrameLayout(mContext.context).also { it.addView(renderer) }
     }
 
     private var currentTrack: VideoTrack? = null
@@ -44,15 +44,7 @@ class LynxVideoComponent(context: LynxContext) : LynxUI<FrameLayout>(context) {
 
     // ── LynxUI lifecycle ─────────────────────────────────────────────────────
 
-    override fun createView(context: LynxContext): FrameLayout = container
-
-    override fun onDetached() {
-        super.onDetached()
-        currentTrack?.removeSink(renderer)
-        currentTrack = null
-        renderer.release()
-        eglBase.release()
-    }
+    override fun createView(context: Context): FrameLayout = container
 
     // ── Props ────────────────────────────────────────────────────────────────
 

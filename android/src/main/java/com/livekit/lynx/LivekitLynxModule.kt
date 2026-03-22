@@ -132,8 +132,9 @@ class LivekitLynxModule(context: Context) : LynxModule(context) {
         callback.invoke(null, null)
     }
 
-    override fun invalidate() {
-        LiveKitLynx.invalidate(lynxCtx.context)
+    /** Call this to clean up resources when the module is being destroyed. */
+    fun cleanup() {
+        audioManager.stop()
     }
 }
 

@@ -32,7 +32,7 @@ object PCManager {
     }
 
     fun create(pcId: Int, config: PeerConnection.RTCConfiguration, observer: PeerConnection.Observer): PeerConnection {
-        require(pcId !in pcs) { "PeerConnection pcId=$pcId already exists" }
+        require(!pcs.containsKey(pcId)) { "PeerConnection pcId=$pcId already exists" }
         val pc = factory.createPeerConnection(config, observer)
             ?: error("createPeerConnection returned null for pcId=$pcId")
         pcs[pcId] = pc
