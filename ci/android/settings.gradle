@@ -1,3 +1,19 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 rootProject.name = 'ci'
 include ':app', ':livekit-lynx'
 project(':livekit-lynx').projectDir = new File(settingsDir, '../../android')

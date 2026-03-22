@@ -29,19 +29,17 @@ export function useRNE2EEManager(
 
     e2eeManager.setup(room);
 
-    const onStatusChange = (enabled: boolean) => {
-      setIsEncryptionEnabled(enabled);
+    // Use (...args: unknown[]) to match SimpleEventEmitter signature
+    const onStatusChange = (...args: unknown[]) => {
+      setIsEncryptionEnabled(args[0] as boolean);
     };
 
-    // @ts-expect-error — SimpleEventEmitter uses (...args: unknown[]) but
-    // livekit-client EncryptionEvent sends a boolean as first arg
     e2eeManager.on(
       EncryptionEvent.ParticipantEncryptionStatusChanged,
       onStatusChange,
     );
 
     return () => {
-      // @ts-expect-error — same as above
       e2eeManager.off(
         EncryptionEvent.ParticipantEncryptionStatusChanged,
         onStatusChange,

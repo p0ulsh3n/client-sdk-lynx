@@ -255,8 +255,8 @@ class LynxRtpReceiver implements RTCRtpReceiver {
   jitterBufferTarget: number | null = null;
   transform: RTCRtpTransform | null = null;
   transport: RTCDtlsTransport | null = null;
-  getContributingSources(): RTCContributingSource[] { return []; }
-  getSynchronizationSources(): RTCSynchronizationSource[] { return []; }
+  getContributingSources(): RTCRtpContributingSource[] { return []; }
+  getSynchronizationSources(): RTCRtpSynchronizationSource[] { return []; }
 
   constructor(pcId: number, json: NativeReceiverJson, track: MediaStreamTrack) {
     this._pcId = pcId;
@@ -329,7 +329,8 @@ class LynxRtpTransceiver implements RTCRtpTransceiver {
     );
   }
   // Required by RTCRtpTransceiver (lib.dom.d.ts TS 5.5+)
-  setCodecPreferences(_codecs: RTCRtpCodecCapability[]): void { /* noop */ }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setCodecPreferences(_codecs: any[]): void { /* noop */ }
 }
 
 // ── RTCPeerConnection ─────────────────────────────────────────────────────
