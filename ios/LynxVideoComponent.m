@@ -5,13 +5,15 @@
 // Uses LYNX_PROP_SETTER macros (official Lynx API) to wire JSX props to
 // the Swift @objc setter methods defined in LynxVideoComponent.swift.
 //
-// Official pattern: https://lynxjs.org/guide/custom-native-component
-// Example reference: LynxExplorerInput.m in the Lynx Explorer project.
+// NOTE: We use @import (modular imports) instead of #import to avoid
+// C++ header conflicts.  <Lynx/Lynx.h> transitively includes C++ headers
+// like <memory>, and the -Swift.h header contains #ifdef __cplusplus
+// sections that fail when compiled as ObjC++.  Modular imports handle
+// the C++/ObjC boundary correctly because modules are pre-compiled.
 // ─────────────────────────────────────────────────────────────────────────────
 
-#import <Lynx/Lynx.h>
-// Import the Swift-generated header for the module (framework target)
-#import <livekit_lynx/livekit_lynx-Swift.h>
+@import Lynx;
+@import livekit_lynx;
 
 // Register the Custom Native Component with Lynx.
 // The tag "livekit-webrtc-view" must match exactly what is used in JSX.
