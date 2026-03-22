@@ -110,7 +110,6 @@ jobs:
       - name: Compile iOS
         working-directory: ./ci/ios/
         run: |
-          set -o pipefail && \
           xcodebuild -workspace ci.xcworkspace/ \
             -scheme ci \
             -destination generic/platform=iOS \
@@ -119,4 +118,5 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGNING_ALLOWED="NO" \
-            clean build | xcpretty
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            clean build 2>&1 | tail -200

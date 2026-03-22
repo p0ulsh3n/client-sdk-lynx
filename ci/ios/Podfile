@@ -29,6 +29,9 @@ post_install do |installer|
       # Clang modules as Objective-C++ so C++ headers are understood.
       config.build_settings['SWIFT_OBJC_INTEROP_MODE'] = 'objcxx'
       config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -cxx-interoperability-mode=default'
+
+      # Allow non-modular includes (Lynx headers use non-modular imports)
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
     end
   end
 end
