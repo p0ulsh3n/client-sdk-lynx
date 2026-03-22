@@ -1,11 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// LynxVideoComponent.m – Companion ObjC pour enregistrer les props Lynx
-// (Swift logic dans LynxVideoComponent.swift)
+// @livekit/lynx-webrtc — ios/LynxVideoComponent.m
+// Obj-C companion pour enregistrer les props + UI (Swift logic dans .swift)
 // ─────────────────────────────────────────────────────────────────────────────
 
-#import <Lynx/LynxPropsProcessor.h>     // LYNX_PROP_SETTER + LYNX_LAZY_REGISTER_UI
+#import <Lynx/LynxComponentRegistry.h>
+#import <Lynx/LynxPropsProcessor.h>     // ← OBLIGATOIRE pour LYNX_PROP_SETTER + LYNX_LAZY_REGISTER_UI
 
-// Import Swift classes via modular import (pas de C++ transitif)
+// Import Swift classes via modular import (aucun C++)
 @import livekit_lynx;
 
 @implementation LynxVideoComponentUI
