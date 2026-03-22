@@ -5,23 +5,30 @@ target 'ci' do
   pod 'livekit-lynx', :path => '../..'
 end
 
-# ── Fix C++ build + Xcode 16 compat for Lynx / PrimJS pods ─────────────────
-# lynx.h includes <memory> (C++ stdlib) — Swift can't find it without the
-# C++ stdlib include path. This is lynx-family/primjs Issue #55.
+# ── Fix C++ build + Swift/C++ interop for Lynx pods ────────────────────────
+# Lynx headers include C++ code (<memory>, <string>, etc.).
+# When Swift imports the Lynx module, Clang must compile those headers
+# as Objective-C++ (not Objective-C). Swift 5.9+ supports this via
+# `-cxx-interoperability-mode=default` and SWIFT_OBJC_INTEROP_MODE=objcxx.
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'gnu++17'
       config.build_settings['CLANG_CXX_LIBRARY']           = 'libc++'
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']   = '14.0'
-      # Add C++ stdlib include path so <memory>, <string>, etc. are found
-      config.build_settings['HEADER_SEARCH_PATHS'] = '$(inherited) $(SDKROOT)/usr/include/c++/v1'
+
       # Never treat warnings as errors in third-party pods
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
-      # Suppress all warnings in third-party pods
-      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
-      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-everything -ferror-limit=0'
+
+      # Suppress warnings in third-party pods
+      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-everything'
+      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-everything'
+
+      # Enable Swift/C++ interop: tells Swift compiler to process imported
+      # Clang modules as Objective-C++ so C++ headers are understood.
+      config.build_settings['SWIFT_OBJC_INTEROP_MODE'] = 'objcxx'
+      config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -cxx-interoperability-mode=default'
     end
   end
 end

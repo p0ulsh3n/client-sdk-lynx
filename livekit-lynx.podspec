@@ -24,7 +24,9 @@ Pod::Spec.new do |s|
     'DEFINES_MODULE'               => 'YES',
     'CLANG_CXX_LANGUAGE_STANDARD'  => 'gnu++17',
     'CLANG_CXX_LIBRARY'            => 'libc++',
-    'HEADER_SEARCH_PATHS'          => '$(SDKROOT)/usr/include/c++/v1 $(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)'
+    'HEADER_SEARCH_PATHS'          => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)',
+    'SWIFT_OBJC_INTEROP_MODE'      => 'objcxx',
+    'OTHER_SWIFT_FLAGS'            => '$(inherited) -cxx-interoperability-mode=default'
   }
 
   # Lynx SDK — provided by the host app
