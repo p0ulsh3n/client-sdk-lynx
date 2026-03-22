@@ -10,6 +10,7 @@
 import AVFoundation
 import AVKit
 import Foundation
+import UIKit
 import WebRTC
 
 // MARK: - AudioUtils  (port of AudioUtils.swift from RN SDK)

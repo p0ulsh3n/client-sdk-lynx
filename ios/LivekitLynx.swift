@@ -55,6 +55,6 @@ import WebRTC
 
     @objc public var videoEncoderFactory: RTCVideoEncoderFactory?
     @objc public var videoDecoderFactory: RTCVideoDecoderFactory?
-    @objc public var audioProcessingModule: RTCAudioProcessingModule?
+    @objc public var audioProcessingModule: RTCDefaultAudioProcessingModule?
     @objc public var defaultTrackVolume: Double = 1.0
 }

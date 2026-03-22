@@ -67,8 +67,9 @@ public final class LynxE2EEModule: NSObject {
                     return
                 }
                 let algo = rtcAlgorithm(from: algorithm)
-                let cryptor = RTCFrameCryptorFactory.frameCryptor(
-                    with: sender,
+                let cryptor = RTCFrameCryptor(
+                    factory: nil,
+                    rtpSender: sender,
                     participantId: participantId,
                     algorithm: algo,
                     keyProvider: kp
@@ -104,8 +105,9 @@ public final class LynxE2EEModule: NSObject {
                     return
                 }
                 let algo = rtcAlgorithm(from: algorithm)
-                let cryptor = RTCFrameCryptorFactory.frameCryptor(
-                    with: receiver,
+                let cryptor = RTCFrameCryptor(
+                    factory: nil,
+                    rtpReceiver: receiver,
                     participantId: participantId,
                     algorithm: algo,
                     keyProvider: kp
@@ -184,11 +186,11 @@ public final class LynxE2EEModule: NSObject {
         let kp = RTCFrameCryptorKeyProvider(
             ratchetSalt: ratchetSalt,
             ratchetWindowSize: ratchetWindow,
-            sharedKey: sharedKey,
+            sharedKeyMode: sharedKey,
+            uncryptedMagicBytes: magicBytes,
             failureTolerance: failureTol,
             keyRingSize: keyRingSize,
-            discardFrameWhenCryptorNotReady: discardWhenNotReady,
-            uncryptedMagicBytes: magicBytes
+            discardFrameWhenCryptorNotReady: discardWhenNotReady
         )
         let tag = UUID().uuidString
         lock.withLock { keyProviders[tag] = kp }
@@ -255,7 +257,7 @@ public final class LynxE2EEModule: NSObject {
             callback("KeyProvider not found: \(tag)", nil)
             return
         }
-        kp.ratchetKey(forParticipant: participantId, with: Int32(keyIndex))
+        kp.ratchetKey(participantId, withIndex: Int32(keyIndex))
         callback(nil, nil)
     }
 
@@ -380,7 +382,7 @@ public final class LynxE2EEModule: NSObject {
     // MARK: - Helpers
 
     private func rtcAlgorithm(from string: String) -> RTCCryptorAlgorithm {
-        string == "AES-CBC" ? .aescbc : .aesGcm
+        string == "AES-CBC" ? .aesCbc : .aesGcm
     }
 }
 
