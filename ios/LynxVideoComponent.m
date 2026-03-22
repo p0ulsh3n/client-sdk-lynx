@@ -1,16 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/LynxVideoComponent.m
-// Obj-C companion for LynxVideoComponentUI.
-//
-// IMPORTANT: We use specific Lynx ObjC headers instead of the umbrella
-// <Lynx/Lynx.h> to avoid transitive C++ header includes (<memory>).
-// The Swift-generated module import (@import) gives access to Swift classes.
+// LynxVideoComponent.m – Companion ObjC pour enregistrer les props Lynx
+// (Swift logic dans LynxVideoComponent.swift)
 // ─────────────────────────────────────────────────────────────────────────────
 
-#import <Lynx/LynxUI.h>
-#import <Lynx/LynxComponentRegistry.h>
+#import <Lynx/LynxPropsProcessor.h>     // LYNX_PROP_SETTER + LYNX_LAZY_REGISTER_UI
 
-// Import the Swift classes via modular import (no C++ issues)
+// Import Swift classes via modular import (pas de C++ transitif)
 @import livekit_lynx;
 
 @implementation LynxVideoComponentUI
