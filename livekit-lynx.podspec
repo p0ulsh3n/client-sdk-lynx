@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   }
 
   # Lynx SDK — provided by the host app
-  s.dependency "Lynx"
+  s.dependency "Lynx", "~> 3.2.0"
 
   # Google WebRTC — same version as Flutter SDK (newest stable)
   s.dependency "WebRTC-SDK", "144.7559.01"

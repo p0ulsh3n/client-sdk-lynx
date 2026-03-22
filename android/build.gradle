@@ -49,7 +49,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${getExtOrDefault('kotlinVersion')}"
 
   // Lynx SDK (compileOnly — host app provides it)
-  compileOnly 'com.github.lynx-family:lynx:3.+'
+  compileOnly 'org.lynxsdk.lynx:lynx:3.2.0'
 
   // Google WebRTC — same version as RN SDK (137.7151.04)
   api 'io.github.webrtc-sdk:android:137.7151.04'
