@@ -19,8 +19,16 @@ Pod::Spec.new do |s|
   # Same as livekit-react-native.podspec
   s.framework = "AVFAudio"
 
-  # Swift/Objective-C compatibility — same as both SDKs
-  s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
+  # Swift/Objective-C compatibility + C++ flags for Lynx/PrimJS headers
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE'               => 'YES',
+    'CLANG_CXX_LANGUAGE_STANDARD'  => 'c++17',
+    'CLANG_CXX_LIBRARY'            => 'libc++',
+    'HEADER_SEARCH_PATHS'          => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(inherited)'
+  }
+
+  # Ensure C++17 even if pod_target_xcconfig is overridden
+  s.compiler_flags = '-std=c++17'
 
   # Lynx SDK — provided by the host app
   s.dependency "Lynx"

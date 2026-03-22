@@ -65,6 +65,10 @@ export class MediaStreamTrack extends EventTarget {
   onunmute: ((this: MediaStreamTrack, ev: Event) => void) | null = null;
   onended: ((this: MediaStreamTrack, ev: Event) => void) | null = null;
 
+  // ── lib.dom.d.ts stubs (TS 5.5+ WebRTC 2025) ──────────────────────────────
+  contentHint = '';
+  getCapabilities(): MediaTrackCapabilities { return {}; }
+
   constructor(opts: {
     id: string;
     kind: TrackKind;

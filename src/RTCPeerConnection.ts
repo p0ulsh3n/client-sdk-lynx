@@ -85,11 +85,17 @@ export interface RTCRtpSender {
   getStats(): Promise<RTCStatsReport>;
 }
 
+// ── Full compatibility lib.dom.d.ts (TS 5.5+ WebRTC 2025) ─────────────────────
 export interface RTCRtpReceiver {
   readonly track: MediaStreamTrack;
   readonly receiverId: string;
+  jitterBufferTarget: number | null;
+  transform: RTCRtpTransform | null;
+  transport: RTCDtlsTransport | null;
   getParameters(): RTCRtpReceiveParameters;
   getStats(): Promise<RTCStatsReport>;
+  getContributingSources(): RTCRtpContributingSource[];
+  getSynchronizationSources(): RTCRtpSynchronizationSource[];
 }
 
 export interface RTCRtpTransceiver {
@@ -101,6 +107,8 @@ export interface RTCRtpTransceiver {
   readonly stopped: boolean;
   readonly mid: string | null;
   stop(): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setCodecPreferences(codecs: any[]): void;
 }
 
 export type RTCRtpTransceiverDirection =
@@ -833,12 +841,13 @@ export class RTCPeerConnection extends EventTarget {
       return stream;
     });
 
-    const ev = new RTCTrackEvent('track', {
-      receiver: receiver as unknown as RTCRtpReceiver,
-      track: track as unknown as globalThis.MediaStreamTrack,
-      streams: streams as unknown as globalThis.MediaStream[],
-      transceiver: undefined as unknown as RTCRtpTransceiver,
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ev = new (RTCTrackEvent as any)('track', {
+      receiver,
+      track,
+      streams,
+      transceiver: undefined,
+    }) as RTCTrackEvent;
     this.dispatchEvent(ev);
     this.ontrack?.(ev);
   }
