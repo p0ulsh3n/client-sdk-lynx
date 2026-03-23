@@ -257,7 +257,7 @@ public final class LynxE2EEModule: NSObject {
             callback("KeyProvider not found: \(tag)", nil)
             return
         }
-        let newKey = kp.ratchetKey(participantId, with: Int32(keyIndex))
+        _ = kp.ratchetKey(participantId, with: Int32(keyIndex))
         callback(nil, nil)
     }
 

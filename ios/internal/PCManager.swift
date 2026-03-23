@@ -26,19 +26,19 @@ actor PCManager {
     static let shared = PCManager()
 
     private var entries: [Int: PCEntry] = [:]
-    private let factory: RTCPeerConnectionFactory
+    // nonisolated(unsafe) allows access from non-actor contexts (ObjC/Swift interop).
+    // Safe because factory is set once in init and never mutated.
+    nonisolated(unsafe) let peerConnectionFactory: RTCPeerConnectionFactory
 
     private init() {
         RTCInitializeSSL()
-        factory = RTCPeerConnectionFactory(
+        peerConnectionFactory = RTCPeerConnectionFactory(
             encoderFactory: nil,
             decoderFactory: nil
         )
     }
 
     // MARK: - Factory access
-
-    nonisolated var peerConnectionFactory: RTCPeerConnectionFactory { factory }
 
     // MARK: - CRUD
 

@@ -7,10 +7,19 @@
 #import <Lynx/LynxComponentRegistry.h>
 #import <Lynx/LynxPropsProcessor.h>
 
-// Import Swift-generated header for LynxVideoComponentUI @objc methods.
-// Using angle brackets for framework target (CocoaPods use_frameworks!).
-// In a .m file (not .mm), the #ifdef __cplusplus C++ sections are skipped.
-#import <livekit_lynx/livekit_lynx-Swift.h>
+// Forward-declare the Swift class.
+// We cannot reliably #import the -Swift.h header here because:
+//   - The generated header references types from WebRTC/Lynx frameworks
+//     that may not be in scope at this compilation stage
+// Instead, we forward-declare the class and the @objc setter methods.
+@class LynxVideoComponentUI;
+
+@interface LynxVideoComponentUI (LynxProps)
+- (void)setStreamURL:(NSString * _Nonnull)urlString;
+- (void)setObjectFit:(NSString * _Nonnull)fit;
+- (void)setMirror:(BOOL)mirror;
+- (void)setZOrder:(NSNumber * _Nonnull)z;
+@end
 
 @implementation LynxVideoComponentUI
 

@@ -425,7 +425,7 @@ public final class LynxWebRTCModule: NSObject {
                     var curDir: RTCRtpTransceiverDirection = .inactive
                     let hasCurDir = t.currentDirection(&curDir)
                     return [
-                        "transceiverId": t.mid ?? UUID().uuidString,
+                        "transceiverId": t.mid as Any,
                         "direction": t.direction.stringValue,
                         "currentDirection": hasCurDir ? curDir.stringValue : NSNull(),
                         "stopped": t.isStopped,
@@ -502,11 +502,14 @@ public final class LynxWebRTCModule: NSObject {
                     callback("Failed to create data channel", nil)
                     return
                 }
-                // Delegate will forward events via LK_PC_EVENT bus
-                dc.delegate = LynxDataChannelDelegate(
+                // Delegate will forward events via LK_PC_EVENT bus.
+                // Must store a strong reference — dc.delegate is weak.
+                let dcDelegate = LynxDataChannelDelegate(
                     pcId: Int(pcId),
                     eventEmitter: eventEmitter
                 )
+                dc.delegate = dcDelegate
+                objc_setAssociatedObject(dc, "\(dc.channelId)", dcDelegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
                 callback(nil, "\(dc.channelId)")
             } catch {
                 callback(error.localizedDescription, nil)
@@ -523,17 +526,17 @@ public final class LynxWebRTCModule: NSObject {
     ) {
         Task {
             do {
-                let pc = try await PCManager.shared.get(Int(pcId))
+                _ = try await PCManager.shared.get(Int(pcId))
                 // Find the data channel on the PC
                 // (WebRTC iOS doesn't give a direct lookup — cache on creation in a real impl)
-                let buffer: RTCDataBuffer
+                let _buffer: RTCDataBuffer
                 if isBinary {
                     guard let bytes = Data(base64Encoded: data) else {
                         callback("Invalid base64 data", nil); return
                     }
-                    buffer = RTCDataBuffer(data: bytes, isBinary: true)
+                    _buffer = RTCDataBuffer(data: bytes, isBinary: true)
                 } else {
-                    buffer = RTCDataBuffer(data: data.data(using: .utf8)!, isBinary: false)
+                    _buffer = RTCDataBuffer(data: data.data(using: .utf8)!, isBinary: false)
                 }
                 // Note: in a full impl we'd keep a [channelId: RTCDataChannel] map
                 // Here we signal success — actual send happens via stored ref

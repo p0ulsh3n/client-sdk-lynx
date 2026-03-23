@@ -33,7 +33,7 @@ Pod::Spec.new do |s|
     'CLANG_CXX_LANGUAGE_STANDARD'                           => 'gnu++17',
     'CLANG_CXX_LIBRARY'                                     => 'libc++',
     'HEADER_SEARCH_PATHS'                                   => '$(PODS_ROOT)/** $(PODS_TARGET_SRCROOT)/** $(PODS_ROOT)/Lynx/Lynx.framework/Headers $(inherited)',
-    'FRAMEWORK_SEARCH_PATHS'                                => '$(inherited) $(PODS_ROOT)/Lynx $(PODS_ROOT)/Lynx/Lynx.framework',
+    'FRAMEWORK_SEARCH_PATHS'                                => '$(inherited) $(PODS_ROOT)/Lynx',
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES'
   }
 
