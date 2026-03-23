@@ -15,14 +15,14 @@ import WebRTC
 // MARK: - LynxPCDelegate
 
 /// Per-PeerConnection delegate that routes WebRTC events to the JS event bus
-/// via `LynxEventEmitter`. Conforms to `@unchecked Sendable` because
+/// via `LKLynxEventEmitter`. Conforms to `@unchecked Sendable` because
 /// delegate methods are always called on WebRTC's internal signalling thread.
 final class LynxPCDelegate: NSObject, RTCPeerConnectionDelegate, @unchecked Sendable {
 
     let pcId: Int
-    weak var eventEmitter: LynxEventEmitter?
+    weak var eventEmitter: LKLynxEventEmitter?
 
-    init(pcId: Int, eventEmitter: LynxEventEmitter?) {
+    init(pcId: Int, eventEmitter: LKLynxEventEmitter?) {
         self.pcId = pcId
         self.eventEmitter = eventEmitter
     }
@@ -129,7 +129,7 @@ final class LynxPCDelegate: NSObject, RTCPeerConnectionDelegate, @unchecked Send
 public final class LynxWebRTCModule: NSObject {
 
     // Lynx injects the event emitter when the module is instantiated.
-    @objc public var eventEmitter: LynxEventEmitter?
+    @objc public var eventEmitter: LKLynxEventEmitter?
 
     // Per-pcId delegates, kept alive while the PC lives.
     private var delegates: [Int: LynxPCDelegate] = [:]
@@ -845,9 +845,9 @@ public final class LynxWebRTCModule: NSObject {
 
 final class LynxDataChannelDelegate: NSObject, RTCDataChannelDelegate, @unchecked Sendable {
     let pcId: Int
-    weak var eventEmitter: LynxEventEmitter?
+    weak var eventEmitter: LKLynxEventEmitter?
 
-    init(pcId: Int, eventEmitter: LynxEventEmitter?) {
+    init(pcId: Int, eventEmitter: LKLynxEventEmitter?) {
         self.pcId = pcId
         self.eventEmitter = eventEmitter
     }

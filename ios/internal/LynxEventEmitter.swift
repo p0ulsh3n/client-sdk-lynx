@@ -7,7 +7,7 @@ import Foundation
 
 /// Protocol-style event emitter used by all NativeModules to send events to JS.
 /// In a full Lynx integration, replace with the actual Lynx event bridge.
-@objc public class LynxEventEmitter: NSObject {
+@objc(LKLynxEventEmitter) public class LKLynxEventEmitter: NSObject {
 
     private var listeners: [String: [(String) -> Void]] = [:]
 

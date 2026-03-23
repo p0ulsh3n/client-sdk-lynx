@@ -15,7 +15,7 @@ import WebRTC
 @objc(LynxAudioModule)
 public final class LynxAudioModule: NSObject {
 
-    @objc public var eventEmitter: LynxEventEmitter?
+    @objc public var eventEmitter: LKLynxEventEmitter?
 
     private let rendererManager = LynxAudioRendererManager()
 

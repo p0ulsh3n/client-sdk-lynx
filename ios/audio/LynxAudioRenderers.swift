@@ -3,7 +3,7 @@
 // Port of VolumeAudioRenderer, MultibandVolumeAudioRenderer, AudioSinkRenderer
 // from the React Native SDK to Lynx.
 //
-// Replaces: RCTEventEmitter → LynxEventEmitter
+// Replaces: RCTEventEmitter → LKLynxEventEmitter
 // All audio processing logic is preserved verbatim.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -57,9 +57,9 @@ public class BaseVolumeAudioRenderer: NSObject, RTCAudioRenderer {
 public final class LynxVolumeAudioRenderer: BaseVolumeAudioRenderer {
 
     public var reactTag: String?
-    private weak var eventEmitter: LynxEventEmitter?
+    private weak var eventEmitter: LKLynxEventEmitter?
 
-    public init(intervalMs: Double, eventEmitter: LynxEventEmitter) {
+    public init(intervalMs: Double, eventEmitter: LKLynxEventEmitter) {
         self.eventEmitter = eventEmitter
         super.init(intervalMs: intervalMs)
     }
@@ -127,14 +127,14 @@ public class BaseMultibandVolumeAudioRenderer: NSObject, RTCAudioRenderer {
 public final class LynxMultibandVolumeAudioRenderer: BaseMultibandVolumeAudioRenderer {
 
     public var reactTag: String?
-    private weak var eventEmitter: LynxEventEmitter?
+    private weak var eventEmitter: LKLynxEventEmitter?
 
     public init(
         bands: Int,
         minFrequency: Float,
         maxFrequency: Float,
         intervalMs: Float,
-        eventEmitter: LynxEventEmitter
+        eventEmitter: LKLynxEventEmitter
     ) {
         self.eventEmitter = eventEmitter
         super.init(
@@ -179,9 +179,9 @@ public class BaseAudioSinkRenderer: NSObject, RTCAudioRenderer {
 public final class LynxAudioSinkRenderer: BaseAudioSinkRenderer {
 
     public var reactTag: String?
-    private weak var eventEmitter: LynxEventEmitter?
+    private weak var eventEmitter: LKLynxEventEmitter?
 
-    public init(eventEmitter: LynxEventEmitter) {
+    public init(eventEmitter: LKLynxEventEmitter) {
         self.eventEmitter = eventEmitter
     }
 
