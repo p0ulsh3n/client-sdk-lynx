@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/LynxAudioModule.swift
-// Lynx NativeModule — audio volume/multiband processors and audio sink.
-// Port of LivekitReactNativeModule audio methods.
-//
-// Registration (LynxInitProcessor.m):
-//   [globalConfig registerModule:LynxAudioModule.class];
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

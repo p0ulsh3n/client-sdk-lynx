@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — RTCSessionDescription.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 export type RTCSdpType = 'offer' | 'pranswer' | 'answer' | 'rollback';
 
 export interface RTCSessionDescriptionInit {
@@ -26,10 +22,6 @@ export class RTCSessionDescription {
     return { type: this.type, sdp: this.sdp };
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RTCIceCandidate
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface RTCIceCandidateInit {
   candidate?: string;

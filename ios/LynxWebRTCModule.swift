@@ -1,14 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/LynxWebRTCModule.swift
-// Lynx NativeModule bridging RTCPeerConnection to JavaScript.
-//
-// Registration (LynxInitProcessor.m or equivalent):
-//   [globalConfig registerModule:LynxWebRTCModule.class];
-//
-// Dependencies (Podfile):
-//   pod 'livekit-lynx-webrtc', :path => '../node_modules/@livekit/lynx-webrtc/ios'
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

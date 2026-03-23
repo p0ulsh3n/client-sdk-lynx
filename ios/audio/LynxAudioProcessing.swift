@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LynxAudioProcessing.swift
-// Port of AudioProcessing.swift, FFTProcessor.swift, RingBuffer.swift,
-// and AVAudioPCMBuffer extensions from the React Native SDK.
-//
-// Zero logic changes — only import statements updated.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Accelerate
 import AVFoundation
 import Foundation

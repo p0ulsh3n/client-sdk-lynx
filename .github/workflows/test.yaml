@@ -38,3 +38,6 @@ jobs:
 
       - name: TypeScript
         run: yarn typescript
+
+      - name: Unit tests
+        run: yarn test

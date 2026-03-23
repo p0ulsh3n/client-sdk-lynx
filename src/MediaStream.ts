@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — MediaStream.ts
-// Polyfill for the W3C MediaStream API over Lynx NativeModules.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxWebRTCModule, promisify } from './NativeModule';
 import { MediaStreamTrack } from './MediaStreamTrack';
 

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/internal/PCManager.swift
-// Swift 6 actor managing all RTCPeerConnection instances.
-// Thread-safe via actor isolation — no locks needed.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

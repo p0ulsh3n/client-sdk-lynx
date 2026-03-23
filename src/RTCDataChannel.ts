@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — RTCDataChannel.ts
-// Polyfill for the W3C RTCDataChannel API over Lynx NativeModules.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxWebRTCModule } from './NativeModule';
 import { addListener, removeListener } from './EventBus';
 

@@ -1,15 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/EventBus.ts
-// Wrapper around Lynx's GlobalEventEmitter.
-//
-// The correct API per official Lynx docs (lynxjs.org/react/thinking-in-reactlynx):
-//   lynx.getJSModule('GlobalEventEmitter').addListener(name, handler)
-//   lynx.getJSModule('GlobalEventEmitter').removeListener(name, handler)
-//
-// Must be used inside useEffect (background-only code).
-// Native side emits via: LynxContext.sendGlobalEvent(name, data)
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const NATIVE_EVENTS = [
   'LK_PC_EVENT',
   'LK_VOLUME_PROCESSED',

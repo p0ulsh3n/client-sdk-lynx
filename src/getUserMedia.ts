@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — getUserMedia.ts
-// Polyfill for navigator.mediaDevices.getUserMedia and enumerateDevices.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxWebRTCModule, promisify } from './NativeModule';
 import { MediaStream } from './MediaStream';
 import { MediaStreamTrack } from './MediaStreamTrack';

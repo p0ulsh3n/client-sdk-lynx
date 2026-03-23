@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/internal/TrackRegistry.swift
-// Actor-isolated registry of all native MediaStreamTrack objects.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

@@ -1,19 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — example/src/App.tsx
-// Full TikTok-style LIVE room built with @livekit/lynx.
-//
-// Demonstrates:
-//   - registerGlobals()
-//   - LiveKitRoom component
-//   - useTracks / VideoTrack
-//   - useLocalParticipant
-//   - useParticipants
-//   - AudioSession
-//   - useIOSAudioManagement
-//   - BarVisualizer
-//   - Data channel chat
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useState, useEffect, useCallback, useRef } from '@lynx-js/react';
 import {
   registerGlobals,
@@ -32,13 +16,10 @@ import {
 } from '@livekit/lynx';
 import { Track, ConnectionState, type Room } from 'livekit-client';
 
-// ── Bootstrap — must be called before any LiveKit usage ──────────────────────
 registerGlobals();
 setLogLevel('warn');
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Config — replace with your values
-// ─────────────────────────────────────────────────────────────────────────────
+
 const LIVEKIT_URL    = 'wss://your-server.livekit.cloud';
 const TOKEN_ENDPOINT = 'https://your-backend.com/api/livekit-token';
 
@@ -50,9 +31,6 @@ async function fetchToken(roomName: string, identity: string): Promise<string> {
   return json.token;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Root component
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function App(): JSX.Element {
   const [token, setToken]     = useState<string | undefined>();
@@ -92,9 +70,6 @@ export default function App(): JSX.Element {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RoomView — rendered inside <LiveKitRoom>
-// ─────────────────────────────────────────────────────────────────────────────
 
 function RoomView({ onLeave }: { onLeave: () => void }): JSX.Element {
   const connectionState = useConnectionState();
@@ -227,9 +202,6 @@ function RoomView({ onLeave }: { onLeave: () => void }): JSX.Element {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LobbyScreen
-// ─────────────────────────────────────────────────────────────────────────────
 
 function LobbyScreen({ onJoin }: { onJoin: () => void }): JSX.Element {
   return (
@@ -245,9 +217,6 @@ function LobbyScreen({ onJoin }: { onJoin: () => void }): JSX.Element {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Styles — Lynx CSS-in-JS (same API as React Native StyleSheet)
-// ─────────────────────────────────────────────────────────────────────────────
 
 const styles: Record<string, Record<string, unknown>> = {
   container: {

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/polyfills/MediaRecorderShim.ts
-// Port of @livekit/react-native src/polyfills/MediaRecorderShim.ts
-// Injects our MediaRecorder into the global scope if not already present.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { MediaRecorder } from './MediaRecorder';
 
 (function shimMediaRecorder() {

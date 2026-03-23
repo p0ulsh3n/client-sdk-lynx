@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/components/LynxViewPortDetector.tsx
-// Replaces @livekit/react-native ViewPortDetector.tsx
-//
-// The RN version used AppState + View.measure (polling every 1 s).
-// Lynx has a native IntersectionObserver API which is more efficient.
-// Falls back to a polling approach if IntersectionObserver is unavailable.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type ReactNode,
   useCallback,
@@ -15,10 +6,6 @@ import {
   type RefObject,
 } from '@lynx-js/react';
 import * as React from '@lynx-js/react';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Props
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface LynxViewPortDetectorProps {
   /** When true, visibility detection is disabled and onChange is never called. */
@@ -34,10 +21,6 @@ export interface LynxViewPortDetectorProps {
 }
 
 const DEFAULT_DELAY = 1000;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Detects when a component enters or leaves the viewport.

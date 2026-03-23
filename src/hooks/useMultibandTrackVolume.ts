@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/hooks/useMultibandTrackVolume.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
 import { Track, type LocalAudioTrack, type RemoteAudioTrack } from 'livekit-client';
 import { useEffect, useMemo, useState } from '@lynx-js/react';

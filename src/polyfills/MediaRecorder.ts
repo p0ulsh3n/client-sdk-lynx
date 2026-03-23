@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/polyfills/MediaRecorder.ts
-// Audio-only MediaRecorder implementation for Lynx.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type { MediaStream } from '../MediaStream';
 import { addListener, removeListener } from '../EventBus';
 import { LynxAudioModule } from '../NativeModule';

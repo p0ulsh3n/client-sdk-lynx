@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/useParticipant.ts
-// Port of @livekit/react-native useParticipant.ts
-// Only change: `react` → `@lynx-js/react`
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   ConnectionQuality,
   LocalParticipant,

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — e2ee/RTCFrameCryptorFactory.ts
-// JS implementations of RTCFrameCryptor, RTCKeyProvider, RTCDataPacketCryptor.
-// All heavy lifting is delegated to LynxE2EEModule.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxE2EEModule, promisify } from '../NativeModule';
 import {
   RTCEncryptedPacket,
@@ -19,10 +13,6 @@ import {
 // Re-export all types so LynxE2EEManager can import them from this file
 export type { RTCEncryptedPacket, RTCFrameCryptor, RTCKeyProvider, RTCKeyProviderOptions, RTCRtpReceiverHandle, RTCRtpSenderHandle, RTCDataPacketCryptor } from './types';
 export { RTCFrameCryptorAlgorithm } from './types';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxFrameCryptor
-// ─────────────────────────────────────────────────────────────────────────────
 
 class LynxFrameCryptor implements RTCFrameCryptor {
   readonly cryptorId: string;
@@ -49,10 +39,6 @@ class LynxFrameCryptor implements RTCFrameCryptor {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxKeyProvider
-// ─────────────────────────────────────────────────────────────────────────────
 
 class LynxKeyProvider implements RTCKeyProvider {
   readonly providerTag: string;
@@ -133,10 +119,6 @@ class LynxKeyProvider implements RTCKeyProvider {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LynxDataPacketCryptor
-// ─────────────────────────────────────────────────────────────────────────────
-
 class LynxDataPacketCryptor implements RTCDataPacketCryptor {
   private readonly _cryptorTag: string;
 
@@ -193,10 +175,6 @@ class LynxDataPacketCryptor implements RTCDataPacketCryptor {
     return base64ToUint8Array(resultJson);
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RTCFrameCryptorFactory — public API (matches react-native-webrtc)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const RTCFrameCryptorFactory = {
   /**
@@ -267,10 +245,6 @@ export const RTCFrameCryptorFactory = {
   },
 } as const;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// RTCDataPacketCryptorFactory — public API
-// ─────────────────────────────────────────────────────────────────────────────
-
 export const RTCDataPacketCryptorFactory = {
   async createDataPacketCryptor(
     algorithm: RTCFrameCryptorAlgorithm,
@@ -286,10 +260,6 @@ export const RTCDataPacketCryptorFactory = {
     return new LynxDataPacketCryptor(tag);
   },
 } as const;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 function encodeKey(key: string | Uint8Array): string {
   if (typeof key === 'string') {

@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/e2ee/RNKeyProvider.ts
-// Port of RNKeyProvider.ts — imports from local package.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { BaseKeyProvider, type KeyProviderOptions } from 'livekit-client';
 import { RTCFrameCryptorFactory, type RTCKeyProvider, type RTCKeyProviderOptions } from './RTCFrameCryptorFactory';
 

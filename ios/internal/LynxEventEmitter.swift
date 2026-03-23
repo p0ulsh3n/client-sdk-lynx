@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — ios/internal/LynxEventEmitter.swift
-// Lightweight event emitter bridging native events to Lynx's JS runtime.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 
 /// Protocol-style event emitter used by all NativeModules to send events to JS.

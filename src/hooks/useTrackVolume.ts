@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/hooks/useTrackVolume.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
 import { Track, type LocalAudioTrack, type RemoteAudioTrack } from 'livekit-client';
 import { useEffect, useState } from '@lynx-js/react';

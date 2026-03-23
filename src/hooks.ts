@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/hooks.ts
-// Identical to @livekit/react-native src/hooks.ts
-// @livekit/components-react is JS-pure — no changes needed.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export {
   useConnectionState,
   useDataChannel,

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/components/VideoView.tsx
-// Port of @livekit/react-native src/components/VideoView.tsx
-// @deprecated  Use `VideoTrack` instead.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type ElementInfo,
   LocalVideoTrack,
@@ -120,10 +114,6 @@ export const VideoView = ({
 };
 
 const containerStyle: Record<string, unknown> = { flex: 1, width: '100%' };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// VideoViewElementInfo — identical to VideoTrackElementInfo
-// ─────────────────────────────────────────────────────────────────────────────
 
 class VideoViewElementInfo implements ElementInfo {
   element: object = {};

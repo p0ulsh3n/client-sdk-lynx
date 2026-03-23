@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/e2ee/LynxE2EEManager.ts
-// Port of RNE2EEManager.ts — same logic, imports from local package.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   RTCFrameCryptorFactory,
   RTCDataPacketCryptorFactory,

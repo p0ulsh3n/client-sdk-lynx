@@ -1,23 +1,19 @@
 # client-sdk-lynx
 
-[![CI](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ci.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ci.yml)
-[![iOS](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ios.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/ios.yml)
-[![Android](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/android.yml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/android.yml)
+[![Native Build](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/native_build.yaml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/native_build.yaml)
+[![Test](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/test.yaml/badge.svg)](https://github.com/p0ulsh3n/client-sdk-lynx/actions/workflows/test.yaml)
 
 > **LiveKit SDK for [Lynx](https://lynxjs.org) (ReactLynx)** — real-time video, audio and data.
->
-> Port of [`@livekit/react-native`](https://github.com/livekit/client-sdk-react-native) adapted for Lynx (ByteDance).
 
 ---
 
-## Quick start
+## Quick Start
 
 ```bash
 yarn add @livekit/lynx livekit-client
 ```
 
 ```ts
-// index.ts — FIRST IMPORT
 import { registerGlobals } from '@livekit/lynx';
 registerGlobals();
 ```
@@ -55,9 +51,9 @@ Full setup guide: **[SETUP.md](./SETUP.md)**
 ```
 client-sdk-lynx/
 ├── src/          TypeScript: RTCPeerConnection, MediaStream, hooks, components
-├── ios/          Swift 6 + ObjC: LynxWebRTCModule, LynxVideoComponent, AudioSession
-├── android/      Kotlin 2.0: LynxWebRTCModule, LynxVideoComponent, AudioSession
-└── example/      TikTok-style LIVE room demo
+├── ios/          Swift + ObjC: LynxWebRTCModule, LynxVideoComponent, AudioSession
+├── android/      Kotlin: LynxWebRTCModule, LynxVideoComponent, AudioSession
+└── ci/           CI build configurations for iOS and Android
 ```
 
 ## License

@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — ios/LivekitLynxModule.swift
-// Lynx NativeModule — AudioSession management + volume processor setup.
-// Port of LivekitReactNativeModule.swift from @livekit/react-native.
-//
-// Registration (LynxInitProcessor.m):
-//   [globalConfig registerModule:LivekitLynxModule.class];
-// ─────────────────────────────────────────────────────────────────────────────
-
 import AVFoundation
 import AVKit
 import Foundation

@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LynxAudioRendererManager.swift
-// Port of AudioRendererManager.swift from @livekit/react-native.
-//
-// Key changes vs RN original:
-//   - RCTBridge + WebRTCModule.track(forId:pcId:) → TrackRegistry actor
-//   - LKAudioProcessingManager → LKLynxAudioProcessingManager (ObjC)
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

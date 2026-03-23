@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/LKNativeLynxModule.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type { LivekitLynxModuleSpec } from './typing';
 
 const LINKING_ERROR =

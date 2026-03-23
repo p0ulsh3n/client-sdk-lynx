@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — MediaStreamTrack.ts
-// Polyfill for the W3C MediaStreamTrack API over Lynx NativeModules.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxWebRTCModule, promisify } from './NativeModule';
 
 export type TrackKind = 'audio' | 'video';

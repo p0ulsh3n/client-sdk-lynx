@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — e2ee/types.ts
-// E2EE type definitions matching @livekit/react-native-webrtc.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface RTCKeyProviderOptions {
   sharedKey?: boolean;
   ratchetSalt?: string | Uint8Array;

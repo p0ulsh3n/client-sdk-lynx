@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/LynxMediaStreamModule.swift
-// Handles getUserMedia (camera + microphone capture) and enumerateDevices.
-// Uses Swift 6 concurrency throughout.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import AVFoundation
 import Foundation
 import WebRTC

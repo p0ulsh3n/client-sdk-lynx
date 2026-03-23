@@ -1,74 +1,53 @@
-# Contributing to livekit-lynx
+# Contributing to client-sdk-lynx
 
-Thank you for contributing! This is a community port of the LiveKit SDK for
-the [Lynx](https://lynxjs.org) framework.
+Thank you for contributing!
 
 ## Prerequisites
 
 - Node.js 20+
-- Yarn 4+
+- Yarn
 - Xcode 16+ (iOS development)
-- Android Studio Iguana+ with API 34 SDK (Android development)
+- Android Studio with API 34 SDK (Android development)
 
 ## Setup
 
 ```bash
-git clone https://github.com/livekit/livekit-lynx
-cd livekit-lynx
+git clone https://github.com/p0ulsh3n/client-sdk-lynx
+cd client-sdk-lynx
 yarn install
 ```
 
-## Architecture
-
-Read the [migration plan](docs/migration-plan.md) to understand how this
-SDK maps to `@livekit/react-native` and `client-sdk-flutter`.
-
-Key principle: **`livekit-client` (JS pure) is never modified.** All
-changes are in the bridge layer only.
-
-## Package structure
+## Project Structure
 
 ```
-packages/
-├── livekit-lynx-webrtc/   WebRTC polyfill (@livekit/lynx-webrtc)
-├── livekit-lynx/          High-level SDK (@livekit/lynx)
-└── example/               Demo app
+client-sdk-lynx/
+├── src/          TypeScript: RTCPeerConnection, MediaStream, hooks, components
+├── ios/          Swift + ObjC: native modules and video component
+├── android/      Kotlin: native modules and video component
+└── ci/           CI build configurations
 ```
 
-## Running the example
+Key principle: **`livekit-client` (JS) is never modified.** All changes are in the bridge layer only.
+
+## Type Checking
 
 ```bash
-# Start dev server
-cd packages/example
-yarn dev
-
-# iOS (requires Xcode)
-cd ios && pod install && cd ..
-open ios/LiveKitLynxExample.xcworkspace
-
-# Android
-npx lynx-cli run android
+yarn typescript
 ```
 
-## Type checking
-
-```bash
-yarn typecheck
-```
-
-## Submitting changes
+## Submitting Changes
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feat/my-feature`
 3. Commit with conventional commits: `feat: add screen sharing support`
-4. Open a pull request with a clear description of what changed and why
+4. Open a pull request with a clear description
 
-## Reporting issues
+## Reporting Issues
 
 Please include:
 - Platform (iOS / Android) and OS version
 - Lynx version
-- `@livekit/lynx` and `@livekit/lynx-webrtc` versions
+- `@livekit/lynx` version
 - Minimal reproduction case
 
 ## License

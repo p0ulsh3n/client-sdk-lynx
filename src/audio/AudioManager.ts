@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/audio/AudioManager.ts
-// Port of @livekit/react-native src/audio/AudioManager.ts
-// Only change: `react-native` Platform → SystemInfo (Lynx global)
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useEffect, useMemo, useState } from '@lynx-js/react';
 import {
   RoomEvent,
@@ -113,10 +107,6 @@ export function useIOSAudioManagement(
     AudioSession.setAppleAudioConfiguration(config);
   }, [trackState, onConfigureNativeAudio, preferSpeakerOutput]);
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Private helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 function computeAudioTrackState(
   local: number,

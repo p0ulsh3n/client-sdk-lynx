@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LKLynxAudioProcessingAdapter.h
-// Port of LKAudioProcessingAdapter.h from @livekit/react-native.
-// Replaces: WebRTC.h → already imported via livekit-lynx-webrtc-webrtc dependency.
-// ─────────────────────────────────────────────────────────────────────────────
-
 #import <Foundation/Foundation.h>
 #import <WebRTC/WebRTC.h>
 

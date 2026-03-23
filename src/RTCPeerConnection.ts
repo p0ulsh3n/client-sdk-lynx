@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — RTCPeerConnection.ts
-// Full polyfill for the W3C RTCPeerConnection API over Lynx NativeModules.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LynxWebRTCModule, promisify } from './NativeModule';
 import { MediaStream } from './MediaStream';
 import { MediaStreamTrack } from './MediaStreamTrack';

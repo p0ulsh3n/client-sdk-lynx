@@ -1,0 +1,23 @@
+platform :ios, '14.0'
+use_frameworks!
+
+target 'LiveKitLynxExample' do
+  # LiveKit Lynx SDK (local path during development)
+  pod 'livekit-lynx', :path => '../..'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD']  = 'gnu++17'
+      config.build_settings['CLANG_CXX_LIBRARY']            = 'libc++'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']   = '14.0'
+      config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+      config.build_settings['OTHER_CFLAGS']                 = '$(inherited) -Wno-everything'
+      config.build_settings['OTHER_CPLUSPLUSFLAGS']         = '$(inherited) -Wno-everything'
+      config.build_settings['SWIFT_OBJC_INTEROP_MODE']      = 'objcxx'
+      config.build_settings['OTHER_SWIFT_FLAGS']            = '$(inherited) -cxx-interoperability-mode=default'
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+    end
+  end
+end

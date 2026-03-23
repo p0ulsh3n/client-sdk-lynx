@@ -1,17 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/components/VideoTrack.tsx
-// Port of @livekit/react-native src/components/VideoTrack.tsx
-//
-// Changes vs RN SDK:
-//   - `View`, `StyleSheet` → Lynx inline styles
-//   - `RTCView`           → <livekit-webrtc-view> Custom Native Component
-//   - `LayoutChangeEvent` → Lynx onLayout event shape
-//   - `AppState`          → Lynx lifecycle (handled by LynxViewPortDetector)
-//   - `forwardRef`        → kept (identical API in @lynx-js/react)
-//
-// All adaptive-stream / ElementInfo logic is identical to the RN SDK.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type ElementInfo,
   LocalVideoTrack,
@@ -30,10 +16,6 @@ import * as React from '@lynx-js/react';
 import { RemoteVideoTrack } from 'livekit-client';
 import type { TrackReference } from '@livekit/components-react';
 import LynxViewPortDetector from './LynxViewPortDetector';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type VideoTrackProps = {
   /** The track reference to display. */
@@ -57,10 +39,6 @@ export type VideoTrackProps = {
    */
   zOrder?: number;
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const VideoTrack = forwardRef<unknown, VideoTrackProps>(
   (
@@ -166,10 +144,6 @@ export const VideoTrack = forwardRef<unknown, VideoTrackProps>(
 
 VideoTrack.displayName = 'VideoTrack';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Inline style objects
-// ─────────────────────────────────────────────────────────────────────────────
-
 const containerStyle: Record<string, unknown> = {
   flex: 1,
   width: '100%',
@@ -179,12 +153,6 @@ const videoStyle: Record<string, unknown> = {
   flex: 1,
   width: '100%',
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// VideoTrackElementInfo
-// Implements livekit-client's ElementInfo interface for adaptive streaming.
-// Identical logic to the RN SDK — only the onLayout source changes.
-// ─────────────────────────────────────────────────────────────────────────────
 
 class VideoTrackElementInfo implements ElementInfo {
   element: object = {};

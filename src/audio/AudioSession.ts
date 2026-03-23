@@ -1,15 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/audio/AudioSession.ts
-// Port of @livekit/react-native src/audio/AudioSession.ts
-// Only change: import source updated to Lynx module.
-// All types, constants and methods are identical to the RN SDK.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { LivekitLynxModule } from '../NativeModule';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types (100% identical to RN SDK)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type AudioConfiguration = {
   android?: {
@@ -127,10 +116,6 @@ export type AudioTrackState =
   | 'localOnly'
   | 'localAndRemote';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper (100% identical to RN SDK)
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function getDefaultAppleAudioConfigurationForMode(
   mode: AudioTrackState,
   preferSpeakerOutput = true,
@@ -155,10 +140,6 @@ export function getDefaultAppleAudioConfigurationForMode(
     audioMode: 'default',
   };
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AudioSession class (100% identical to RN SDK — only module import changed)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default class AudioSession {
 

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/useRoom.ts
-// Port of @livekit/react-native src/useRoom.ts
-// Only change: `react` → `@lynx-js/react`
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type AudioTrack,
   ConnectionState,

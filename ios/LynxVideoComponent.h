@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/LynxVideoComponent.h
-// Objective-C header for the LynxUI<RTCMTLVideoView> video component.
-// ─────────────────────────────────────────────────────────────────────────────
-
 #import <Lynx/LynxUI.h>
 #import <Lynx/LynxShadowNode.h>
 #import <WebRTC/RTCMTLVideoView.h>

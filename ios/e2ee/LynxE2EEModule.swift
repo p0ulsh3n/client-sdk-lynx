@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/e2ee/LynxE2EEModule.swift
-// Lynx NativeModule — E2EE frame cryptors, key providers, data packet cryptors.
-// Port of @livekit/react-native-webrtc E2EE classes.
-//
-// Registration (LynxInitProcessor.m):
-//   [globalConfig registerModule:LynxE2EEModule.class];
-// ─────────────────────────────────────────────────────────────────────────────
-
 import Foundation
 import WebRTC
 

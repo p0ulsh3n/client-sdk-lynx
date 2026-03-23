@@ -1,17 +1,8 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LynxAudioRenderers.swift
-// Port of VolumeAudioRenderer, MultibandVolumeAudioRenderer, AudioSinkRenderer
-// from the React Native SDK to Lynx.
-//
-// Replaces: RCTEventEmitter → LKLynxEventEmitter
-// All audio processing logic is preserved verbatim.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import AVFoundation
 import Foundation
 import WebRTC
 
-// MARK: - Event name constants (mirrors LKEvents in RN SDK)
+// MARK: - Event name constants
 
 private enum LynxAudioEvents {
     static let volumeProcessed = "LK_VOLUME_PROCESSED"
@@ -19,9 +10,7 @@ private enum LynxAudioEvents {
     static let audioData = "LK_AUDIO_DATA"
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // MARK: - BaseVolumeAudioRenderer
-// ─────────────────────────────────────────────────────────────────────────────
 
 /// Base class for volume tracking. Processes every Nth PCM frame (throttled).
 public class BaseVolumeAudioRenderer: NSObject, RTCAudioRenderer {
@@ -82,9 +71,9 @@ public final class LynxVolumeAudioRenderer: BaseVolumeAudioRenderer {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // MARK: - BaseMultibandVolumeAudioRenderer
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 /// Base class for multiband FFT volume tracking.
 public class BaseMultibandVolumeAudioRenderer: NSObject, RTCAudioRenderer {
@@ -159,9 +148,9 @@ public final class LynxMultibandVolumeAudioRenderer: BaseMultibandVolumeAudioRen
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+
 // MARK: - BaseAudioSinkRenderer
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 /// Base class for raw PCM audio sink (delivers raw audio frames to JS).
 public class BaseAudioSinkRenderer: NSObject, RTCAudioRenderer {
@@ -207,9 +196,6 @@ public final class LynxAudioSinkRenderer: BaseAudioSinkRenderer {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - Audio Processing Manager
-// ─────────────────────────────────────────────────────────────────────────────
 
-// The canonical audio processing manager is LKLynxAudioProcessingManager (Obj-C).
-// See ios/audio/LKLynxAudioProcessingManager.h for the full interface.
+// MARK: - Audio Processing Manager
+

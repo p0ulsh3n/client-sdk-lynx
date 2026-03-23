@@ -14,7 +14,7 @@
     "livekit-client": "^2.15.0"
   },
   "devDependencies": {
-    "@lynx-js/react": "^0.1.0",
+    "@lynx-js/react": "^0.116.0",
     "typescript": "^5.5.0"
   }
 }

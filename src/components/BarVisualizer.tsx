@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/components/BarVisualizer.tsx
-// Port of @livekit/react-native src/components/BarVisualizer.tsx
-//
-// Key change: React Native `Animated` API → CSS `transition` via Lynx styles.
-// All sequencer/animator logic is identical to the RN SDK.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type AgentState,
   type TrackReferenceOrPlaceholder,
@@ -19,10 +11,6 @@ import {
 } from '@lynx-js/react';
 import * as React from '@lynx-js/react';
 import { useMultibandTrackVolume } from '../hooks/useMultibandTrackVolume';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types (100% identical to RN SDK)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type BarVisualizerOptions = {
   /** Decimal values from 0 to 1. Default: 1. */
@@ -69,10 +57,6 @@ export interface BarVisualizerProps {
   options?: BarVisualizerOptions;
   style?: Record<string, unknown>;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BarVisualizer component
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Visualises audio signals from a TrackReference as animated bars.
@@ -146,10 +130,6 @@ export function BarVisualizer({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// useBarAnimator — 100% identical to RN SDK
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function useBarAnimator(
   state: AgentState | undefined,
   columns: number,
@@ -195,10 +175,6 @@ export function useBarAnimator(
 
   return sequence[index % sequence.length] ?? [];
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Sequence generators — identical to RN SDK
-// ─────────────────────────────────────────────────────────────────────────────
 
 function generateListeningSequence(columns: number): number[][] {
   const center = Math.floor(columns / 2);

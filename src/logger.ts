@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/logger.ts
-// Identical to @livekit/react-native logger.ts
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { setLogLevel as setClientSdkLogLevel } from 'livekit-client';
 import loglevel from 'loglevel';
 

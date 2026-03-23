@@ -122,3 +122,44 @@ export default function App() {
   );
 }
 ```
+
+---
+
+## Testing & Verification
+
+### Unit Tests (no device needed)
+
+```bash
+yarn test        # run once
+yarn test:watch  # watch mode
+```
+
+### Runtime Testing on a Device
+
+Fastest option: free sandbox at [cloud.livekit.io](https://cloud.livekit.io):
+
+1. Create a free project → copy WebSocket URL
+2. Dashboard → **Sandbox** → generate a token
+3. In `example/src/App.tsx`, set `LIVEKIT_URL` and the token
+
+```bash
+cd example
+
+# iOS
+pod install --project-directory=ios
+yarn ios
+
+# Android
+yarn android
+```
+
+See [example/README.md](./example/README.md) for the full guide.
+
+### Verification Checklist
+
+- [ ] Lobby screen appears on launch
+- [ ] "Start LIVE" connects to the server
+- [ ] Local camera video renders via `<livekit-webrtc-view>`
+- [ ] Remote participant video appears
+- [ ] Chat data channel sends and receives messages
+- [ ] ✕ button disconnects cleanly

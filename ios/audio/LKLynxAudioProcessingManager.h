@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LKLynxAudioProcessingManager.h
-// Port of LKAudioProcessingManager.h from @livekit/react-native.
-// ─────────────────────────────────────────────────────────────────────────────
-
 #import <Foundation/Foundation.h>
 #import <WebRTC/WebRTC.h>
 #import "LKLynxAudioProcessingAdapter.h"

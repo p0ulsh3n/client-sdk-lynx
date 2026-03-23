@@ -1,7 +1,6 @@
 {
   "name": "@livekit/lynx",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "LiveKit real-time video, audio and data for Lynx (ReactLynx)",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -28,6 +27,8 @@
   ],
   "scripts": {
     "typescript": "tsc --noemit -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "release": "release-it",
     "pods": "cd example && pod install --project-directory=ios",
@@ -43,16 +44,19 @@
     "realtime",
     "tiktok"
   ],
-  "author": "LiveKit contributors",
+  "author": "p0ulsh3n",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/livekit/client-sdk-lynx.git"
+    "url": "https://github.com/p0ulsh3n/client-sdk-lynx.git"
   },
   "bugs": {
-    "url": "https://github.com/livekit/client-sdk-lynx/issues"
+    "url": "https://github.com/p0ulsh3n/client-sdk-lynx/issues"
   },
-  "homepage": "https://github.com/livekit/client-sdk-lynx",
+  "homepage": "https://github.com/p0ulsh3n/client-sdk-lynx",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@livekit/components-react": "^2.9.0",
     "@livekit/components-core": "^0.12.0",
@@ -78,6 +82,7 @@
     "@types/dom-mediacapture-record": "^1.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "tslib": "^2.6.2"
+    "tslib": "^2.6.2",
+    "vitest": "^2.0.0"
   }
 }

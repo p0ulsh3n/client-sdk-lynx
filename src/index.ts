@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/index.ts
-// Call registerGlobals() ONCE before any LiveKit code.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import './polyfills/MediaRecorderShim';
 import type { LiveKitReactNativeInfo } from 'livekit-client';
 import { RTCPeerConnection } from './RTCPeerConnection';
@@ -12,7 +7,6 @@ import { MediaStreamTrack } from './MediaStreamTrack';
 import { RTCDataChannel } from './RTCDataChannel';
 import { getUserMedia, enumerateDevices, type MediaStreamConstraints } from './getUserMedia';
 
-// ─────────────────────────────────────────────────────────────────────────────
 export interface RegisterGlobalsOptions {
   autoConfigureAudioSession?: boolean;
 }
@@ -85,9 +79,6 @@ function _shimCryptoUUID(): void {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Exports
-// ─────────────────────────────────────────────────────────────────────────────
 export { RTCPeerConnection }                   from './RTCPeerConnection';
 export { RTCSessionDescription, RTCIceCandidate } from './RTCSessionDescription';
 export { MediaStream }                         from './MediaStream';

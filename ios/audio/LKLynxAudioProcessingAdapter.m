@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx-webrtc — ios/audio/LKLynxAudioProcessingAdapter.m
-// Port of LKAudioProcessingAdapter.m from @livekit/react-native.
-// Zero logic changes — only class name prefix updated.
-// ─────────────────────────────────────────────────────────────────────────────
-
 #import "LKLynxAudioProcessingAdapter.h"
 #import <WebRTC/RTCAudioRenderer.h>
 #import <os/lock.h>

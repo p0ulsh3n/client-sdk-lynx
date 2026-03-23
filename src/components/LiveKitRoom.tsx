@@ -1,10 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// @livekit/lynx — src/components/LiveKitRoom.tsx
-// Port of @livekit/react-native src/components/LiveKitRoom.tsx
-// Change: `react` → `@lynx-js/react`
-// @livekit/components-react is JS-pure — no change needed.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import {
   type FeatureFlags,
   LKFeatureContext,
@@ -21,10 +14,6 @@ import type {
 import type { MediaDeviceFailure, Room } from 'livekit-client';
 import { type ReactNode } from '@lynx-js/react';
 import * as React from '@lynx-js/react';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Props (100 % identical to the RN SDK)
-// ─────────────────────────────────────────────────────────────────────────────
 
 /** @public */
 export interface LiveKitRoomProps {
@@ -92,10 +81,6 @@ export interface LiveKitRoomProps {
 
   children?: ReactNode;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * The `LiveKitRoom` component provides the Room context to all child components.
