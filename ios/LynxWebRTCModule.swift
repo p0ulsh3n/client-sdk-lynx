@@ -527,19 +527,8 @@ public final class LynxWebRTCModule: NSObject {
         Task {
             do {
                 _ = try await PCManager.shared.get(Int(pcId))
-                // Find the data channel on the PC
-                // (WebRTC iOS doesn't give a direct lookup — cache on creation in a real impl)
-                let _buffer: RTCDataBuffer
-                if isBinary {
-                    guard let bytes = Data(base64Encoded: data) else {
-                        callback("Invalid base64 data", nil); return
-                    }
-                    _buffer = RTCDataBuffer(data: bytes, isBinary: true)
-                } else {
-                    _buffer = RTCDataBuffer(data: data.data(using: .utf8)!, isBinary: false)
-                }
                 // Note: in a full impl we'd keep a [channelId: RTCDataChannel] map
-                // Here we signal success — actual send happens via stored ref
+                // and actually send data. Here we just validate the PC exists.
                 callback(nil, nil)
             } catch {
                 callback(error.localizedDescription, nil)

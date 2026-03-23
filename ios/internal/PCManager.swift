@@ -51,7 +51,7 @@ actor PCManager {
         guard entries[pcId] == nil else {
             throw PCManagerError.duplicatePcId(pcId)
         }
-        guard let pc = factory.peerConnection(
+        guard let pc = peerConnectionFactory.peerConnection(
             with: config,
             constraints: constraints,
             delegate: delegate
