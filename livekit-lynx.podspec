@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.exclude_files = "ios/**/LivekitLynx-Bridging-Header.h"
 
   # Only expose ObjC headers that Swift needs via the umbrella header.
-  s.public_header_files = "ios/**/LK*.h", "ios/**/LynxLiveKitSetup.h"
+  s.public_header_files = "ios/**/LK*.h", "ios/**/LynxLiveKitSetup.h", "ios/**/LynxVideoComponent.h"
 
   # Same as livekit-react-native.podspec
   s.framework = "AVFAudio"
