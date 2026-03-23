@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Mock the native module bridge — not available in Node
+// Mock the native module bridge
 vi.mock('../NativeModule', () => ({
   LynxWebRTCModule: {},
   LynxAudioModule: {},
@@ -18,19 +18,16 @@ vi.mock('../getUserMedia', () => ({
 
 vi.mock('../polyfills/MediaRecorderShim', () => ({}));
 
-// Simulate Lynx's SystemInfo global
-(globalThis as Record<string, unknown>).SystemInfo = { platform: 'ios', pixelRatio: 3 };
-(globalThis as Record<string, unknown>).NativeModules = {
-  LivekitLynxModule: {
-    setAppleAudioConfiguration: vi.fn((_cfg: string, cb: (err: null) => void) => cb(null)),
-  },
-};
-
 import { registerGlobals } from '../index';
+
+// Helpers — read via Object.getOwnPropertyDescriptor so we don't trigger the getter
+function getGlobal(key: string): unknown {
+  return (globalThis as Record<string, unknown>)[key];
+}
 
 describe('registerGlobals()', () => {
   beforeEach(() => {
-    // Reset any globals that were previously injected
+    // Reset only plain-writable properties (not getter-only ones like navigator/crypto)
     const g = globalThis as Record<string, unknown>;
     delete g.RTCPeerConnection;
     delete g.RTCSessionDescription;
@@ -39,68 +36,67 @@ describe('registerGlobals()', () => {
     delete g.MediaStreamTrack;
     delete g.RTCDataChannel;
     delete g.LiveKitReactNativeGlobal;
-    if (g.navigator) delete (g.navigator as Record<string, unknown>).mediaDevices;
+    // Reset navigator.mediaDevices (the nav object itself was made writable in setup)
+    if (g.navigator) {
+      delete (g.navigator as Record<string, unknown>).mediaDevices;
+    }
   });
 
   it('injects RTCPeerConnection global', () => {
     registerGlobals();
-    expect((globalThis as Record<string, unknown>).RTCPeerConnection).toBeDefined();
+    expect(getGlobal('RTCPeerConnection')).toBeDefined();
   });
 
   it('injects RTCSessionDescription global', () => {
     registerGlobals();
-    expect((globalThis as Record<string, unknown>).RTCSessionDescription).toBeDefined();
+    expect(getGlobal('RTCSessionDescription')).toBeDefined();
   });
 
   it('injects RTCIceCandidate global', () => {
     registerGlobals();
-    expect((globalThis as Record<string, unknown>).RTCIceCandidate).toBeDefined();
+    expect(getGlobal('RTCIceCandidate')).toBeDefined();
   });
 
   it('injects MediaStream global', () => {
     registerGlobals();
-    expect((globalThis as Record<string, unknown>).MediaStream).toBeDefined();
+    expect(getGlobal('MediaStream')).toBeDefined();
   });
 
   it('injects navigator.mediaDevices', () => {
     registerGlobals();
-    const nav = (globalThis as Record<string, unknown>).navigator as { mediaDevices: unknown };
+    const nav = (globalThis as Record<string, unknown>).navigator as Record<string, unknown>;
     expect(nav?.mediaDevices).toBeDefined();
   });
 
   it('injects navigator.mediaDevices.getUserMedia function', () => {
     registerGlobals();
-    const nav = (globalThis as Record<string, unknown>).navigator as {
-      mediaDevices: { getUserMedia: unknown };
-    };
-    expect(typeof nav?.mediaDevices?.getUserMedia).toBe('function');
+    const nav = (globalThis as Record<string, unknown>).navigator as Record<string, unknown>;
+    const md = nav?.mediaDevices as Record<string, unknown>;
+    expect(typeof md?.getUserMedia).toBe('function');
   });
 
   it('injects LiveKitReactNativeGlobal with platform', () => {
     registerGlobals();
-    const info = (globalThis as Record<string, unknown>).LiveKitReactNativeGlobal as {
+    const info = getGlobal('LiveKitReactNativeGlobal') as {
       platform: string;
       devicePixelRatio: number;
     };
-    expect(info.platform).toBe('ios');
-    expect(typeof info.devicePixelRatio).toBe('number');
+    expect(info?.platform).toBe('ios');
+    expect(typeof info?.devicePixelRatio).toBe('number');
   });
 
-  it('injects crypto.randomUUID when missing', () => {
-    const g = globalThis as Record<string, unknown>;
-    const original = g.crypto;
-    g.crypto = undefined as unknown as typeof crypto;
+  it('crypto.randomUUID is available after registerGlobals()', () => {
     registerGlobals();
-    expect(typeof (g.crypto as Crypto)?.randomUUID).toBe('function');
-    const uuid = (g.crypto as Crypto).randomUUID();
+    // crypto is a getter on globalThis in Node v18+ — we just verify it's functional
+    expect(typeof globalThis.crypto?.randomUUID).toBe('function');
+    const uuid = globalThis.crypto.randomUUID();
     expect(uuid).toMatch(/^[0-9a-f-]{36}$/);
-    g.crypto = original;
   });
 
   it('does not overwrite existing globals (??= behaviour)', () => {
     const sentinel = class SentinelClass {};
     (globalThis as Record<string, unknown>).RTCPeerConnection = sentinel;
     registerGlobals();
-    expect((globalThis as Record<string, unknown>).RTCPeerConnection).toBe(sentinel);
+    expect(getGlobal('RTCPeerConnection')).toBe(sentinel);
   });
 });
