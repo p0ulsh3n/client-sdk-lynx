@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 #import <Lynx/LynxUI.h>
+#import <Lynx/LynxShadowNode.h>
 #import <WebRTC/RTCMTLVideoView.h>
 #import <WebRTC/RTCVideoTrack.h>
 

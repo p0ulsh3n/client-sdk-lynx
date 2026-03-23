@@ -5,10 +5,16 @@
   "scripts": {},
   "dependencies": {
     "@livekit/lynx": "file:../../",
-    "livekit-client": "^2.15.0"
+    "livekit-client": "^2.15.0",
+    "@lynx-js/react": "^0.116.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tslib": "^2.6.2"
   },
   "devDependencies": {
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "@types/react": "^18.0.0",
+    "@types/dom-mediacapture-record": "^1.0.0"
   },
   "engines": {
     "node": ">=20"

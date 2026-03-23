@@ -1,6 +1,7 @@
 {
   "name": "@livekit/lynx",
   "version": "1.0.0",
+  "private": true,
   "description": "LiveKit real-time video, audio and data for Lynx (ReactLynx)",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -72,6 +73,11 @@
     "typescript": "^5.5.0",
     "eslint": "^9.0.0",
     "@types/node": "^20.0.0",
-    "@types/events": "^3.0.3"
+    "@types/events": "^3.0.3",
+    "@types/react": "^18.0.0",
+    "@types/dom-mediacapture-record": "^1.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tslib": "^2.6.2"
   }
 }
